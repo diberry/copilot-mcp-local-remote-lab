@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateVideoFixture } from "../../../scripts/video-fixture-schema.mjs";
+import { validateVideoFixture } from "../../scripts/video-fixture-schema.mjs";
 
 const validFixture = {
   transport: "stdio",
