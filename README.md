@@ -39,9 +39,6 @@ The plugin envelope, custom agent, skill, and hook are installed and interpreted
 4. Complete [remote setup](docs/remote-setup.md) and the [comparison lab](docs/comparison-lab.md).
 5. Generate the [visual lab](docs/video-lab.md).
 6. Follow [cleanup and cost controls](docs/cleanup-and-cost.md).
-7. Read the short essay
-   [Where should an Agent Plugin live?](docs/blog/where-should-agent-plugin-live.md)
-   for the architectural decision this experiment is designed to support.
 
 ## Quick validation
 
