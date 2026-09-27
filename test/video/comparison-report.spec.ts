@@ -25,6 +25,12 @@ for (const scene of scenes) {
     await page.goto(`/#${scene}`);
     await page.locator(`[data-scene="${scene}"]`).click();
     await expect(page.locator("h1")).not.toBeEmpty();
+    await expect(page.locator("#boundary")).toContainText(
+      "Loopback Streamable HTTP",
+    );
+    await expect(page.locator("body")).not.toContainText(
+      "Azure Container Apps",
+    );
     await page.waitForTimeout(1200);
     await context.close();
     if (!video) throw new Error("Video recording unavailable.");

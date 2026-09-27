@@ -6,6 +6,10 @@ param location string = deployment().location
 @allowed(['warm', 'cold'])
 param scalingProfile string = 'warm'
 param imageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+@minLength(1)
+param allowedOrigin string = 'https://copilot.local'
+@secure()
+param mcpBearerToken string = ''
 
 var token = toLower(uniqueString(subscription().id, environmentName))
 var tags = { 'azd-env-name': environmentName, purpose: 'copilot-mcp-learning-lab' }
@@ -48,6 +52,8 @@ module app 'modules/container-app.bicep' = {
     registryServer: registry.outputs.loginServer
     imageName: imageName
     minReplicas: scalingProfile == 'warm' ? 1 : 0
+    allowedOrigin: allowedOrigin
+    mcpBearerToken: mcpBearerToken
   }
 }
 

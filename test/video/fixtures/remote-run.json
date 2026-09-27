@@ -1,5 +1,8 @@
 {
   "transport": "streamable-http",
+  "evidenceTier": "remote-test",
+  "remoteEndpoint": "loopback",
+  "discoverySha256": "895e386fbb45acaa9a6e7a90b435748fbae314249b1e3cbc20fc4337cddb438a",
   "pluginVersion": "1.0.0",
   "toolCount": 5,
   "durationsMs": [

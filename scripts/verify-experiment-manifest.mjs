@@ -1,12 +1,12 @@
 import { readFile } from "node:fs/promises";
 import {
   ExperimentManifestSchema,
-  validateBaseline,
+  validateExperiment,
 } from "../dist/packages/experiment-runner/src/manifest.js";
 const manifest = ExperimentManifestSchema.parse(
   JSON.parse(await readFile("examples/experiment-manifest.json", "utf8")),
 );
-validateBaseline(manifest);
+validateExperiment(manifest);
 const text = JSON.stringify(manifest).toLowerCase();
 for (const term of [
   "subscriptionid",
