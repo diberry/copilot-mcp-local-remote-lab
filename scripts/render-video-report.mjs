@@ -1,10 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { validateVideoFixture } from "./video-fixture-schema.mjs";
 const forbiddenKeys =
   /prompt|todo(?:text|content|title)|token|authorization|headers?|environment|user(?:id|identity)|ip(?:address)?|localpath/i;
 for (const file of ["local-run.json", "remote-run.json"]) {
   const input = JSON.parse(
     await readFile(`test/video/fixtures/${file}`, "utf8"),
   );
+  validateVideoFixture(input, file);
   const visit = (value, path = "") => {
     if (Array.isArray(value))
       return value.forEach((item, index) => visit(item, `${path}[${index}]`));

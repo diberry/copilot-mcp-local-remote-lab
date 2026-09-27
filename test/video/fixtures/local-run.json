@@ -4,5 +4,8 @@
   "toolCount": 5,
   "durationsMs": [2, 3, 2, 4, 3, 2, 3, 2, 4, 3, 2, 3, 2, 4, 3, 2, 3, 2, 4, 3],
   "outcome": "success",
-  "errorCategory": "process_start"
+  "recoveryScenario": {
+    "boundaryFailureCategory": "process_start",
+    "recoveryOutcome": "success"
+  }
 }

@@ -11,6 +11,15 @@ const origins = (process.env.ALLOWED_ORIGINS ?? "http://127.0.0.1:3000").split(
   ",",
 );
 const maxBody = 1_048_576;
+const internalRequestOrigin = "http://mcp.internal";
+
+export function toInternalRequestUrl(requestTarget: string | undefined) {
+  const incoming = new URL(requestTarget ?? "/", internalRequestOrigin);
+  return new URL(
+    `${incoming.pathname}${incoming.search}`,
+    internalRequestOrigin,
+  ).toString();
+}
 
 export function createHttpApp(
   service = new TodoService(new InMemoryTodoStorage()),
@@ -61,8 +70,7 @@ export function createHttpApp(
       }
       chunks.push(chunk);
     }
-    const url = `http://${req.headers.host ?? "127.0.0.1"}${req.url}`;
-    const request = new Request(url, {
+    const request = new Request(toInternalRequestUrl(req.url), {
       method: "POST",
       headers: Object.fromEntries(
         Object.entries(req.headers).flatMap(([key, value]) =>

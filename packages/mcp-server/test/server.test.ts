@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { app } from "../src/http.js";
+import { app, toInternalRequestUrl } from "../src/http.js";
 import { createToolExecutor } from "../src/create-server.js";
 import { sanitizeTelemetry } from "../src/telemetry.js";
 
@@ -31,6 +31,15 @@ describe.each(["stdio", "streamable-http"] as const)(
 );
 
 describe("HTTP defenses", () => {
+  it("uses a fixed internal origin while preserving path and query", () => {
+    expect(toInternalRequestUrl("/mcp?request=1")).toBe(
+      "http://mcp.internal/mcp?request=1",
+    );
+    expect(toInternalRequestUrl("//evil.example/mcp?request=1")).toBe(
+      "http://mcp.internal/mcp?request=1",
+    );
+  });
+
   it("rejects method, media type, origin, and missing auth", async () => {
     process.env.NODE_ENV = "test";
     await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve));
@@ -57,6 +66,27 @@ describe("HTTP defenses", () => {
     });
     expect(initialize.status).toBe(200);
     expect(await initialize.text()).toContain('"serverInfo"');
+    const maliciousHost = await fetch(url, {
+      method: "POST",
+      headers: {
+        host: "evil.example",
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        origin: "http://127.0.0.1:3000",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 2,
+        method: "initialize",
+        params: {
+          protocolVersion: "2026-07-28",
+          capabilities: {},
+          clientInfo: { name: "host-header-test", version: "1.0.0" },
+        },
+      }),
+    });
+    expect(maliciousHost.status).toBe(200);
+    expect(await maliciousHost.text()).toContain('"serverInfo"');
     expect((await fetch(url)).status).toBe(405);
     expect(
       (
