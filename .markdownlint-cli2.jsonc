@@ -1,18 +1,18 @@
 {
   "config": {
     "MD013": false,
-    "MD034": false
+    "MD034": false,
   },
   "overrides": [
     {
       "filter": [
         "com.github.copilot/agents/todo-experimenter.agent.md",
-        "skills/compare-todo-execution/SKILL.md"
+        "skills/compare-todo-execution/SKILL.md",
       ],
       "config": {
-        "MD041": false
+        "MD041": false,
       },
-      "combine": "merge"
-    }
-  ]
+      "combine": "merge",
+    },
+  ],
 }
