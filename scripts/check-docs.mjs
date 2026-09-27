@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { filesUnder, root } from "./lib.mjs";
 const required = [
   "README.md",
+  "docs/blog/where-should-agent-plugin-live.md",
   "docs/learning-objectives.md",
   "docs/concepts.md",
   "docs/architecture.md",
