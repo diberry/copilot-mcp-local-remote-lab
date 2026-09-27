@@ -1,0 +1,190 @@
+{
+  "manifest": {
+    "schemaVersion": 1,
+    "pluginId": "copilot-mcp-local-remote-lab",
+    "pluginVersion": "1.0.0",
+    "canonicalPayloadSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "localBundleSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "remoteBundleSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "localBindingSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "remoteBindingSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "sourceCommit": "fixture",
+    "evidenceTier": "remote-test",
+    "remoteEndpoint": "loopback",
+    "remoteImageDigest": null,
+    "acaRevision": null,
+    "protocolVersion": "2026-07-28",
+    "copilotClientVersion": "fixture",
+    "nodeVersion": "22.14.0",
+    "browserVersion": "playwright-chromium",
+    "toolVersions": {
+      "npm": "10.9.2",
+      "az": "2.82.0"
+    },
+    "azureRegion": null,
+    "scalingProfile": "warm",
+    "authMode": "none",
+    "storageMode": "memory",
+    "replicaCount": 1,
+    "temperature": "warm",
+    "syntheticSeed": "todo-v1",
+    "scenarioVersion": "1.0.0",
+    "pairId": "fixture-pair",
+    "runOrder": "local-remote",
+    "timestampUtc": "2026-09-27T00:00:00.000Z",
+    "cell": "baseline"
+  },
+  "failures": 0,
+  "local": {
+    "count": 20,
+    "medianMs": 19.5,
+    "p95Ms": 28
+  },
+  "remote": {
+    "count": 20,
+    "medianMs": 29.5,
+    "p95Ms": 38
+  },
+  "pairs": [
+    {
+      "pairId": "fixture-pair-1",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 10,
+      "remoteMs": 20,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-2",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 11,
+      "remoteMs": 21,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-3",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 12,
+      "remoteMs": 22,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-4",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 13,
+      "remoteMs": 23,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-5",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 14,
+      "remoteMs": 24,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-6",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 15,
+      "remoteMs": 25,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-7",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 16,
+      "remoteMs": 26,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-8",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 17,
+      "remoteMs": 27,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-9",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 18,
+      "remoteMs": 28,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-10",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 19,
+      "remoteMs": 29,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-11",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 20,
+      "remoteMs": 30,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-12",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 21,
+      "remoteMs": 31,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-13",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 22,
+      "remoteMs": 32,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-14",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 23,
+      "remoteMs": 33,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-15",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 24,
+      "remoteMs": 34,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-16",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 25,
+      "remoteMs": 35,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-17",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 26,
+      "remoteMs": 36,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-18",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 27,
+      "remoteMs": 37,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-19",
+      "order": ["stdio", "streamable-http"],
+      "localMs": 28,
+      "remoteMs": 38,
+      "deltaMs": 10
+    },
+    {
+      "pairId": "fixture-pair-20",
+      "order": ["streamable-http", "stdio"],
+      "localMs": 29,
+      "remoteMs": 39,
+      "deltaMs": 10
+    }
+  ]
+}

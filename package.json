@@ -24,7 +24,7 @@
     "plugin:validate": "node scripts/check-generated.mjs",
     "plugin:compare": "node scripts/compare-plugin.mjs",
     "test:discovery-parity": "node scripts/compare-discovery.mjs",
-    "experiment:run": "npm run plugin:build && node dist/packages/experiment-runner/src/cli.js",
+    "experiment:run": "npm run plugin:build && node scripts/run-comparison.mjs",
     "experiment:verify-manifest": "node scripts/verify-experiment-manifest.mjs",
     "verify:no-secrets": "node scripts/verify-no-secrets.mjs",
     "verify:boundaries": "node scripts/verify-boundaries.mjs",
