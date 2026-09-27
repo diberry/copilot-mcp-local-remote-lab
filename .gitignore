@@ -1,0 +1,12 @@
+node_modules/
+dist/
+plugins/
+artifacts/
+playwright-report/
+test-results/
+infra/main.json
+.azure/
+*.log
+.env
+.env.*
+!.env.example

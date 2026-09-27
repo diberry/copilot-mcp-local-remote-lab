@@ -1,0 +1,9 @@
+{
+  "cases": [
+    "stdio-stdout-pollution",
+    "http-invalid-origin",
+    "http-missing-auth",
+    "http-invalid-content-type",
+    "http-body-too-large"
+  ]
+}

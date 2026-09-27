@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "exec": "node",
+        "args": [
+          "${PLUGIN_ROOT}/com.github.copilot/hooks/scripts/record-tool-event.mjs",
+          "start"
+        ],
+        "timeoutSec": 5
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "exec": "node",
+        "args": [
+          "${PLUGIN_ROOT}/com.github.copilot/hooks/scripts/record-tool-event.mjs",
+          "finish"
+        ],
+        "timeoutSec": 5
+      }
+    ]
+  }
+}

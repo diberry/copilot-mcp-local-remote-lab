@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "copilot-mcp-local-remote-lab",
+  "description": "Compare one todo MCP capability across local stdio and remote Streamable HTTP boundaries.",
+  "version": "1.0.0",
+  "author": { "name": "Dina Berry" },
+  "homepage": "https://github.com/diberry/copilot-mcp-local-remote-lab",
+  "repository": "https://github.com/diberry/copilot-mcp-local-remote-lab",
+  "license": "MIT",
+  "keywords": [
+    "github-copilot",
+    "agent-plugin",
+    "mcp",
+    "typescript",
+    "azure-container-apps"
+  ],
+  "skills": ["skills/"],
+  "hooks": "com.github.copilot/hooks/hooks.json"
+}
