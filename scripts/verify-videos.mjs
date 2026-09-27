@@ -18,7 +18,11 @@ for (const id of ids) {
     `artifacts/videos/transcripts/${id}.txt`,
     "utf8",
   );
-  if (!descriptions[id]?.description || transcript.length < 80)
+  if (
+    !descriptions[id]?.description ||
+    descriptions[id]?.expectedDurationSeconds < 20 ||
+    transcript.length < 500
+  )
     throw new Error(`${id}: description/transcript missing`);
   if (forbidden.test(JSON.stringify(descriptions[id]) + transcript))
     throw new Error(`${id}: forbidden evidence`);

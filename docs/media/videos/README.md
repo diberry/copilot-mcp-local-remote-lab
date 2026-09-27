@@ -2,7 +2,9 @@
 
 This learning repository uses generated videos only as instructional evidence.
 
-The lab includes four short, verified WebM previews:
+The lab includes four paced, verified WebM previews. Each video runs for at
+least 20 seconds and presents six steps: context, action, evidence, and a clear
+takeaway.
 
 1. [Execution boundary](./01-execution-boundary.webm) — contrasts the local
    stdio process boundary with the loopback Streamable HTTP boundary.

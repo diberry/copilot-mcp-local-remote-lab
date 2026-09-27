@@ -15,4 +15,13 @@ npm run video:capture
 npm run video:verify
 ```
 
-Open `artifacts/videos/index.html`. The four clips explain the execution boundary, equivalent tool flow, baseline versus cold/warm latency, and failure/recovery. Each has a description and text transcript. Inputs containing forbidden prompt, todo content, token, header, environment, identity, IP, or local-path fields fail closed. Treat videos, traces, screenshots, and raw inputs as local/CI artifacts with workflow retention of seven days.
+Open `artifacts/videos/index.html`. Each 20–30 second clip uses six paced
+steps to establish the question, demonstrate both boundaries, show the
+validated evidence, and state the takeaway. The four clips explain the
+execution boundary, equivalent tool flow, paired latency baseline, and
+failure/recovery. Playwright reads the recorded WebM metadata and rejects any
+clip shorter than 20 seconds. Each clip also has a detailed text transcript.
+Inputs containing forbidden prompt, todo content, token, header, environment,
+identity, IP, or local-path fields fail closed. Treat videos, traces,
+screenshots, and raw inputs as local/CI artifacts with workflow retention of
+seven days.
