@@ -2,6 +2,8 @@ import type { Client } from "@modelcontextprotocol/client";
 import { performance } from "node:perf_hooks";
 import type { TransportName } from "../../mcp-server/src/create-server.js";
 
+// Both clients execute this exact sequence so transport is the only intended
+// variable in a baseline pair.
 export const scenario = [
   ["reset_todos", {}],
   ["add_todo", { title: "synthetic-alpha" }],

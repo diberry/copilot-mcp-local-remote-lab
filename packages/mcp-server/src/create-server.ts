@@ -73,6 +73,8 @@ export function registerTodoTools(
   transport: TransportName,
   service = new TodoService(new InMemoryTodoStorage()),
 ) {
+  // This shared registration seam is the experiment invariant: adapters may
+  // change the boundary, but they cannot change the client-visible tools.
   const execute = createToolExecutor(transport, service);
   const register = (name: string, description: string, inputSchema: any) =>
     server.registerTool(

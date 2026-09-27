@@ -5,13 +5,35 @@
 
 Compare the **same GitHub Copilot Agent Plugin** across two MCP boundaries: a client-launched local process over `stdio`, and the same shared TypeScript tools over Streamable HTTP. The default automated experiment uses a real loopback HTTP listener and is labeled `remote-test`; it is not evidence of an Azure Container Apps (ACA) deployment.
 
+## What you will learn
+
+By completing the lab, you will be able to:
+
+1. Identify which parts of an Agent Plugin stay in the client and which MCP
+   server components can move behind a remote boundary.
+1. Prove that local and remote bindings expose the same plugin payload, tool
+   catalog, schemas, scenario, and domain behavior.
+1. Measure transport overhead with alternating paired runs while holding auth,
+   storage, replica count, temperature, and scenario constant.
+1. Distinguish loopback `remote-test` evidence from evidence collected against
+   an explicitly authorized Azure Container Apps deployment.
+1. Explain the operational tradeoffs introduced by a remote MCP boundary:
+   authentication, origin validation, networking, observability, scaling,
+   cost, and cleanup.
+
+The point is not to prove that one transport is universally better. The point
+is to make the boundary the only intended variable, gather auditable evidence,
+and decide which tradeoffs fit a specific tool.
+
 ## What runs where?
 
 The plugin envelope, custom agent, skill, and hook are installed and interpreted by the Copilot client. The local MCP process runs on the learner device. In an explicitly authorized live experiment, only the remote MCP server runs in ACA. This repository does not implement a Microsoft 365 Copilot plugin.
 
 ## Learning path
 
-1. Read [concepts](docs/concepts.md) and [architecture](docs/architecture.md).
+1. Start with the [learning contract](docs/learning-objectives.md), then read
+   [concepts](docs/concepts.md), [architecture](docs/architecture.md), and the
+   [source code tour](packages/README.md).
 2. Complete [local setup](docs/local-setup.md) and the [usage lab](docs/usage-lab.md).
 3. Read [security and privacy](docs/security-and-privacy.md), then [deployment](docs/deployment.md).
 4. Complete [remote setup](docs/remote-setup.md) and the [comparison lab](docs/comparison-lab.md).
