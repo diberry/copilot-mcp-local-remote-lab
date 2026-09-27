@@ -1,133 +1,137 @@
-# Where should an Agent Plugin live? That is not quite the question
+# Where should an Agent Plugin live? I was asking the wrong question
 
 > This is a learning repository, not a production reference architecture.
 
-When you build a GitHub Copilot Agent Plugin, it is tempting to ask: Should the
-plugin run locally or in the cloud?
+I started this experiment with a simple question:
 
-That question hides the most important architectural distinction.
+> Should a GitHub Copilot Agent Plugin run locally or in the cloud?
 
-The plugin belongs with the client. Its identity, custom agent, skills, hooks,
-and MCP connection configuration shape the experience inside Copilot. What can
+It sounded like the right architectural decision. It wasn't.
+
+The plugin stays with the client. Its identity, custom agent, skills, hooks,
+and MCP configuration shape the experience inside Copilot. The part that can
 move is the **MCP server and the tool execution behind it**.
 
-So the better question is:
+That changes the question:
 
 > When should tool execution remain a client-launched local process, and when
-> should it move behind a remote MCP boundary?
+> has it earned a remote MCP boundary?
 
-That is the question this lab was built to explore.
+That is a much more useful question because it forces us to talk about value,
+not location.
 
-## Start local to learn faster
+## Start local because learning speed matters
 
-A local stdio server is a great starting point. The client launches the
-process, MCP messages travel over standard input and output, and the tool can
-work without a network hop.
+A local stdio server has very little ceremony. The client launches the
+process, exchanges MCP messages over standard input and output, and receives
+the result without a network hop.
 
-That gives you a short feedback loop:
+That makes local execution a strong place to begin:
 
-- Fewer moving parts while you shape the tool contract.
-- Straightforward debugging on the developer machine.
-- Low transport overhead.
-- Offline-capable execution.
-- Access to local resources, when the user explicitly grants it.
+- You can shape the tool contract with fewer moving parts.
+- You can debug the full call path on one machine.
+- You avoid network latency and cloud cost.
+- The tool can work offline.
+- The tool can use explicitly granted local resources.
 
-Local is not merely a prototype mode. For tools whose value is inherently
-local—working with a checked-out repository, a local build, or a developer's
-files—it might be the right final architecture.
+Local is not a lesser architecture. If the job is working with a checked-out
+repository, a local build, or files on a developer's machine, local might be
+exactly where the tool belongs.
 
-But local execution also distributes the runtime. Every user needs compatible
-dependencies, updates, and troubleshooting. Observability is fragmented.
-Server-side integrations can be awkward or inappropriate. Local access also
-raises its own trust questions.
+But local execution distributes responsibility. Every user needs a compatible
+runtime. Updates and support happen across many machines. Observability is
+fragmented. Shared server-side integrations become harder.
 
-## Move the server when the boundary earns its cost
+That tension—not a preference for cloud—is what makes a remote option worth
+testing.
 
-A remote MCP server adds real costs: network latency, authentication, Origin
-validation, deployment, monitoring, scaling, availability, and cloud spend.
-Moving a tool to the cloud is not progress by itself.
+## Move the server only when the boundary earns its cost
 
-The move becomes valuable when it unlocks something the local process cannot
-provide well:
+A remote MCP server can give you centralized updates, managed identity, shared
+integrations, consistent runtime versions, and service-level observability.
+Those are meaningful capabilities.
 
-- Centralized updates and consistent runtime versions.
-- Shared access to server-side systems.
-- Managed identity and controlled secret handling.
-- Central telemetry and operational support.
-- Independent scaling and release management.
-- A stable service boundary for many clients.
+They are not free.
 
-Those benefits must outweigh the new failure modes. A tool call can now fail
-because of DNS, TLS, authorization, throttling, an unavailable revision, or a
-cold instance—even when the tool implementation is correct.
+The network boundary adds authentication, Origin validation, DNS, TLS,
+deployment, monitoring, scaling, availability, and cloud spend. A tool call
+can now fail even when the tool itself is correct.
 
-The decision is therefore not “local is simple” versus “remote is modern.” It
-is whether the remote boundary creates enough operational or product value to
-justify what it introduces.
+So “remote” is not automatically progress. It is progress when the new
+boundary unlocks enough product or operational value to justify the latency
+and complexity it introduces.
 
-## MCP is the seam that makes progress possible
+## The experiment needs one capability, not two implementations
 
-The path to progress is not moving everything. It is designing a seam that
-lets you move the right thing without changing the experience.
+To test the boundary honestly, I built one TypeScript tool implementation and
+used it twice.
 
-In this lab, one TypeScript registration factory defines five todo tools. The
-same schemas, descriptions, domain service, synthetic scenario, agent, skill,
-and hook are used on both sides. The generated plugin bundles are identical
-except for `mcp.json`.
+The plugin identity, agent, skill, hook, schemas, todo service, synthetic
+scenario, and five-tool catalog stay fixed. Both adapters call the same tool
+registration factory. The generated plugin bundles are byte-identical except
+for `mcp.json`.
 
-One binding launches the server over stdio. The other connects through
-Streamable HTTP.
+Only the connection changes:
 
-That separation matters. If we changed the plugin, tools, and transport
-together, any comparison would be ambiguous. By holding the capability
-constant, we can ask useful questions:
+- The local binding launches the MCP server over stdio.
+- The remote binding connects through Streamable HTTP.
 
-- Does the client discover the same tools?
-- Do both paths produce the same domain outcome?
-- What latency does the boundary add in this environment?
-- Which failures are local-process failures, and which are network failures?
-- What security and operational controls does remote execution require?
+That constraint is the heart of the experiment. If I changed the plugin,
+tools, and transport together, I could not explain the result.
 
-MCP gives us a replaceable boundary. It lets a capability begin locally,
-mature behind a shared service, or support both modes without duplicating its
-business logic.
+With one controlled capability, I can ask:
 
-## Measure before you migrate
+- Does Copilot discover the same tools?
+- Do both paths reach the same domain outcome?
+- What latency appears in this environment?
+- Which failures belong to the process, network, or authentication boundary?
+- What does remote operation require that local execution does not?
 
-The lab deliberately avoids declaring a winner.
+MCP becomes the seam that lets the implementation evolve without rewriting the
+experience.
 
-It first proves parity with real MCP clients over stdio and Streamable HTTP.
-Then it runs alternating local-first and remote-first pairs against a fixed
-scenario. Authentication, cold start, persistence, and replica changes stay in
-separate experiment cells so they do not contaminate the baseline.
+## Prove parity before comparing performance
 
-The default remote test uses loopback HTTP. That is useful protocol evidence,
-but it is not cloud evidence. A live Azure Container Apps run must identify and
-verify the actual endpoint, image, revision, region, storage mode, Origin, and
-replica controls.
+The lab does not begin with a stopwatch. It begins with evidence that both
+paths do the same work.
 
-This discipline prevents a common mistake: collecting numbers before proving
-that the two paths are doing the same work.
+Real MCP clients discover tools over stdio and Streamable HTTP. Contract tests
+run the same todo scenario through both boundaries and compare the final state.
+Only after those checks pass does the runner collect alternating local-first
+and remote-first pairs.
 
-## A practical decision rule
+Authentication, cold starts, persistence, and replica changes stay in separate
+experiment cells. Mixing them into the baseline would produce a more dramatic
+chart and a less useful conclusion.
 
-Keep tool execution local while proximity, offline use, local resources, or
-iteration speed are the main source of value.
+The default remote test also uses loopback HTTP. That proves the protocol path,
+not cloud performance. Live Azure Container Apps evidence must be tied to the
+actual endpoint, image, revision, region, storage, Origin, and replica
+controls.
+
+The lesson is simple: before asking which path is faster, prove that both paths
+are equivalent and name exactly what you measured.
+
+## Use this decision rule
+
+Keep tool execution local when its value comes from proximity, offline use,
+local resources, privacy, or iteration speed.
 
 Move it behind a remote MCP boundary when centralized operations, shared
-integrations, managed identity, consistent deployment, or service-level
-observability become more valuable than the additional latency and complexity.
+systems, managed identity, consistent deployment, or observability create more
+value than the added latency and operational burden.
 
-Support both when users genuinely need both contexts—and prove that the
-capability remains equivalent.
+Support both when people genuinely need both contexts—but keep one capability
+contract and continuously prove parity.
 
-The path to progress is not “cloud first.” It is **contract first**:
+That is why MCP is a path to progress. Not because everything should become a
+service, but because a stable contract gives us options:
 
-1. Define one capability.
-1. Separate it from its transport.
-1. Prove parity across boundaries.
+1. Start with the shortest learning loop.
+1. Separate capability from transport.
+1. Prove the two boundaries behave the same.
 1. Measure the tradeoffs.
 1. Move only when the new boundary earns its place.
 
-The Agent Plugin does not need to choose a home. Its MCP contract gives the
-tool implementation room to evolve.
+The Agent Plugin does not need a new home. The MCP contract gives its tools
+room to grow.
