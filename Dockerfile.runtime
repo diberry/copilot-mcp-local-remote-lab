@@ -8,6 +8,8 @@ COPY scripts ./scripts
 COPY skills ./skills
 COPY com.github.copilot ./com.github.copilot
 COPY config ./config
+COPY examples/experiment-manifest.json ./examples/experiment-manifest.json
+COPY test/fixtures ./test/fixtures
 RUN npm run build && node scripts/build-plugin.mjs
 
 FROM node:22.14.0-bookworm-slim@sha256:1c18d9ab3af4585870b92e4dbc5cac5a0dc77dd13df1a5905cea89fc720eb05b
