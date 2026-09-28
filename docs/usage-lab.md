@@ -2,9 +2,9 @@
 
 > This is a learning repository, not a production reference architecture.
 
-The purpose of this lab is to establish behavioral parity, then observe how
-the same client-side AI reasons differently when its MCP tool supplies context
-from a different governed boundary.
+The current exercise establishes tool transport parity. The target exercise
+will compare the complete client plugin with the same capability running
+behind a representative company MCP gateway.
 
 ## 1. Predict the result
 
@@ -56,33 +56,36 @@ This scenario is intentionally small. Its value is not todo functionality; it
 is a controlled probe that crosses every layer—client binding, MCP transport,
 shared registration, validation, domain service, and normalized response.
 
-## 5. Run the context-placement study
+## 5. Record the current prototype limit
 
-Install one binding at a time in a fresh client session. Ask the same agent:
+Install one binding at a time in a fresh client session. Observe that the
+custom agent, skill, and hooks remain installed in the client in both runs.
+That means the current exercise has not moved the complete plugin behind MCP.
 
-> Call diagnostics with the context study enabled. Based only on the returned
-> evidence, which synthetic todo should I work on next? Name the evidence
-> source, explain why it supports that choice, and list my responsibilities
-> separately from the service operator's.
+The optional `diagnostics` context study remains useful for demonstrating
+provenance and responsibility, but it is not evidence of server-hosted plugin
+fidelity.
 
-The local binding should cite `learner-approved-local-fixture` and recommend
-`todo-1`. The remote binding should cite `operator-curated-team-fixture` and
-recommend `todo-3`. Save both responses next to the binding and source commit
-that produced them.
+## 6. Plan the target fidelity run
 
-The expected difference is useful only because the tool contract and client
-instructions remain fixed. Do not say the remote model is smarter. The model
-has different evidence, and the remote evidence carries a different trust and
-responsibility model.
+For each capability, predict whether the server-hosted topology will preserve
+it natively, map it through company MCP, require a thin client companion, or
+lose it:
 
-## 6. Reflect on the handoff
+- agent instructions and decision rules;
+- skill workflow;
+- pre/post hook policy;
+- tools and domain outcome;
+- local and shared context;
+- interactive approvals;
+- normalized errors and recovery;
+- evidence provenance and telemetry.
 
-Answer these questions:
+Then answer:
 
-1. Which local evidence should never leave the learner device?
-1. Which team evidence would be unsafe or expensive to copy to every device?
-1. Who is responsible for freshness, provenance, authorization, and deletion
-   of remote context?
-1. What must the user verify before acting on a remote recommendation?
-1. Does the remote value justify authentication, availability, telemetry,
-   scaling, and cost responsibilities?
+1. Which client-native behaviors are essential to the user experience?
+1. Which company capabilities justify central hosting?
+1. Which user responsibilities move to the company operator?
+1. What new shared failure and trust boundaries appear?
+1. Would you choose client, server behind company MCP, or hybrid, and what
+   evidence would change your answer?

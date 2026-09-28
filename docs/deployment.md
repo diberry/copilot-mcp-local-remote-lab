@@ -4,6 +4,25 @@
 
 Deployment is separate from validation. `npm run check`, the default experiment, and the video workflow use fixture or `remote-test` loopback evidence and never prove or perform an ACA deployment. Only a manifest marked `live-aca` with deployed endpoint metadata may be described as ACA evidence.
 
+> [!WARNING]
+> The current Bicep deploys one public MCP tool service. The target architecture
+> requires two distinct components: a public representative company MCP
+> gateway and a non-public server-hosted plugin runtime behind it. Until that
+> redesign is implemented, deployment does not answer the plugin-placement
+> question.
+
+## Target company-layer deployment
+
+| Component                 | Target responsibility                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Company MCP gateway       | Public MCP endpoint, identity, authorization, policy, routing, rate limits, and content-free telemetry |
+| Server plugin runtime     | Canonical capability execution, shared context access, workflow, policy mappings, and provenance       |
+| Client connection surface | Endpoint and authentication configuration only, plus a thin companion if fidelity tests require one    |
+
+The gateway must be the only public path to the runtime. Direct runtime access
+must fail. Azure evidence must bind both components, their identities, images,
+revisions, ingress modes, policy profile, region, scaling, and cleanup result.
+
 ## What deployment adds to the experiment
 
 The local and loopback labs prove package, protocol, and behavior parity. ACA
@@ -72,9 +91,10 @@ sequenceDiagram
 
 Verify `GET /healthz` and `GET /readyz`, inspect console/system logs by correlation ID only, and never log request content. Use the warm profile (`minReplicas=1`) for runnable baseline and authentication cells. Cold-profile measurements remain a manual follow-on until a distinct runner execution path is implemented. Then follow [cleanup](cleanup-and-cost.md).
 
-Deployment does not move the plugin or model into ACA. It transfers execution
-and operational responsibility for the MCP service. A production version of
-the synthetic team-context exercise would require the operator to own:
+The current deployment does not move the complete plugin into ACA. The target
+deployment will move the portable capability runtime behind the company MCP
+gateway while recording client-native behavior that could not move. A
+production version would require the operator to own:
 
 - source authorization and tenant isolation;
 - evidence freshness and provenance;

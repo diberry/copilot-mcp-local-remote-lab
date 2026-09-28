@@ -1,11 +1,13 @@
-# Source code tour
+# Current transport-prototype source tour
 
-The source is organized to make the experiment variable visible.
+> This code implements the lower-level stdio/HTTP transport prototype. It does
+> not yet contain a separate company MCP gateway or a server-hosted plugin
+> runtime. See the
+> [implementation proposal](../docs/proposals/plugin-behind-company-mcp.md).
 
-The transport baseline proves parity. The context-placement cell then uses the
-same tool implementation to show a second effect of the boundary: which
-governed evidence is available to client-side model reasoning and who is
-responsible for that evidence.
+The source is organized to make the current transport variable visible. Its
+parity evidence remains useful, but it is not complete-plugin fidelity
+evidence.
 
 ## Invariant: shared domain and tool registration
 
@@ -33,7 +35,21 @@ boundary-specific behavior to one of these adapters.
 provenance, recommendation evidence, and a learner/operator responsibility
 split for the active boundary. Both adapters register the same `diagnostics`
 schema. The intentionally different context-study response is therefore a
-controlled evidence-placement result, not a different plugin or tool.
+controlled evidence-placement result, not proof that the plugin runs behind a
+company MCP layer.
+
+## Planned package boundaries
+
+The redesign will add:
+
+- `plugin-capability` as the canonical behavior and fidelity inventory;
+- `client-plugin-adapter` for the complete client-installed package;
+- `company-mcp-gateway` for identity, policy, routing, and telemetry;
+- `server-plugin-runtime` behind the gateway; and
+- a thin client companion only when fidelity tests prove it is required.
+
+The current `mcp-server` and `todo-core` packages can supply tool/domain
+building blocks, but they cannot remain the complete remote architecture.
 
 ## Measurement: paired runner
 

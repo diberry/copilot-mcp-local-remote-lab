@@ -2,77 +2,91 @@
 
 > This is a learning repository, not a production reference architecture.
 
-The client boundary contains the model interaction, package discovery, agent
-instructions, skill, and hooks. The local process and learner-approved context
-are also on the learner device. The cloud boundary contains only the remote MCP
-adapter, its shared tool/domain code, and operator-governed context.
+## Target topologies
+
+The experiment compares two implementation topologies for one intended
+capability. It does not assume that moving behind company MCP preserves every
+Agent Plugin behavior.
+
+### Complete client-hosted plugin
 
 ```mermaid
 flowchart LR
-  U[Learner] --> C[Copilot client<br/>plugin + agent + skill + hook]
-  C -->|JSON-RPC stdio| L[Local MCP process<br/>learner-approved context]
-  C -->|HTTPS POST /mcp| R[Remote MCP in ACA<br/>operator-governed context]
+  U[Learner] --> C[Copilot client]
+  C --> P[Complete Agent Plugin]
+  P --> A[Agent + skill + hooks]
+  P --> R[Local capability runtime]
+  R --> L[Approved local context]
   subgraph Device[Learner device]
     C
-    L
-  end
-  subgraph Azure[Azure trust boundary]
+    P
+    A
     R
+    L
   end
 ```
 
-![Context diagram showing the Copilot client and local MCP process on the learner device, with the remote MCP server in Azure.](media/execution-context.svg)
+The learner owns package installation, runtime compatibility, updates, local
+access, device availability, and local evidence.
 
-Both adapters call one registration factory, which calls one injected todo service. Core code has no MCP, HTTP, or process imports.
+### Server-hosted plugin behind company MCP
+
+```mermaid
+flowchart LR
+  U[Learner] --> C[Copilot client]
+  C --> T[Minimum MCP connection surface]
+  T --> G[Company MCP gateway]
+  G --> P[Server-hosted plugin runtime]
+  P --> S[Shared context and company systems]
+  subgraph Company[Company trust boundary]
+    G
+    P
+    S
+  end
+```
+
+The company gateway owns authentication, authorization, policy, routing, rate
+limits, and content-free operational telemetry. The plugin runtime behind it
+owns the portable capability behavior and shared context access. The company
+operator owns deployment, updates, availability, recovery, scaling, and cost.
+The user still owns authentication, disclosure choices, and the decision to
+trust or reject returned evidence.
+
+## Capability mapping
 
 ```mermaid
 flowchart TB
-  S[stdio adapter] --> F[registerTodoTools]
-  H[HTTP adapter] --> F
-  F --> D[TodoService]
-  D --> M[In-memory storage]
+  D[Canonical capability definition] --> C[Client Agent Plugin adapter]
+  D --> S[Server plugin-runtime adapter]
+  C --> CP[Complete client package]
+  S --> G[Company MCP gateway]
+  D --> F[Fidelity inventory]
+  CP --> F
+  G --> F
 ```
 
-![Container diagram showing both stdio and HTTP adapters calling one shared tool-registration layer and todo core.](media/execution-containers.svg)
+The canonical capability definition records tool behavior, agent intent, skill
+workflow, hook policy, context requirements, approvals, errors, and telemetry.
+The adapters may produce different artifacts. Byte identity is not the target.
+Every capability must instead receive one fidelity status:
 
-Each invocation follows the same logical sequence, with only the selected transport changing.
+- `native`;
+- `mapped`;
+- `companion-required`; or
+- `unsupported`.
 
-```mermaid
-sequenceDiagram
-  actor Learner
-  participant Client
-  participant Transport
-  participant Tools
-  participant Core
-  Learner->>Client: Fixed synthetic scenario
-  Client->>Transport: MCP request
-  Transport->>Tools: Registered tool
-  Tools->>Core: Validated operation
-  Core-->>Client: Normalized result
-```
+The hybrid topology is not assumed. It is selected only when a fidelity test
+shows that valuable client-native behavior cannot cross MCP or when local and
+offline context is a requirement.
 
-![Sequence diagram tracing a todo tool call through the selected MCP transport, shared tools, and TodoService.](media/tool-call-sequence.svg)
+## Current implementation gap
 
-The external inventories under `artifacts/plugin-inventory/` prove all bundle
-files except `mcp.json` are byte-identical. Discovery exports prove the same
-five names, descriptions, and schemas are visible. The baseline fixes auth off,
-memory storage, one warm replica, seed, order, version, and machine; only the
-boundary differs.
+The repository currently builds one client plugin with local and remote MCP
+bindings. Its custom agent, skill, and hooks remain client-side in both cases.
+The HTTP adapter directly hosts the tools. There is no separate company MCP
+gateway or server-hosted plugin runtime.
 
-The context-placement cell uses the same `diagnostics` implementation and
-schema but asks for synthetic decision evidence. The stdio adapter identifies
-learner-approved local context; the HTTP adapter identifies operator-curated
-team context. This difference is deliberate and must not be interpreted as a
-baseline parity failure.
-
-```mermaid
-flowchart LR
-  M[Client-side model] --> T[Same diagnostics tool]
-  T --> LC[Local evidence<br/>learner governs]
-  T --> RC[Remote evidence<br/>operator governs]
-  LC --> LR[Local recommendation]
-  RC --> RR[Remote recommendation]
-```
-
-The model still reasons in the client. The MCP boundary changes which governed
-evidence can reach that reasoning and who must keep the evidence trustworthy.
+Those tests remain useful as a transport baseline, but they cannot answer
+whether the complete plugin retains its behavior behind a company MCP layer.
+The implementation changes are planned in the
+[company MCP architecture proposal](proposals/plugin-behind-company-mcp.md).

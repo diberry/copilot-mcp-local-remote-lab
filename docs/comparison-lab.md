@@ -4,15 +4,21 @@
 
 ## Question and hypothesis
 
-**Question:** What changes in transport, available decision evidence, and
-responsibility when one plugin and tool implementation cross a local process
-boundary versus an HTTP boundary?
+**Question:** What do I gain and lose when a complete client-installed plugin
+is moved behind my company's MCP layer?
 
-**Hypothesis:** Discovery and domain outcomes remain equivalent. HTTP adds
-transport latency and operational concerns, while enabling centralized hosting
-and shared observability. In a separate context-placement cell, centrally
-governed evidence can change the model's recommendation without changing the
-client-side model or plugin.
+**Hypothesis:** Tool and task outcomes can remain equivalent, but some
+client-native agent, skill, hook, local-context, and approval behavior will
+require mapping, a thin companion, or an accepted loss. The company layer adds
+central identity, policy, shared context, updates, observability, and
+operations while introducing network dependence, shared blast radius, and
+company cost.
+
+> [!WARNING]
+> The commands below validate the current transport prototype only. They do not
+> yet run a complete server-hosted plugin behind a separate company MCP
+> gateway. Use them as supporting evidence while implementing the
+> [architecture proposal](proposals/plugin-behind-company-mcp.md).
 
 Run parity checks before measurements:
 
@@ -22,7 +28,8 @@ npm run test:discovery-parity
 npm run test:e2e
 ```
 
-If any parity check fails, do not interpret latency results.
+If any parity check fails, do not interpret latency results. Passing these
+checks proves tool transport parity, not complete-plugin fidelity.
 
 ## Evidence tiers
 
@@ -57,31 +64,51 @@ Use this observation table:
 | Tail behavior        | Local and remote p95                | Variability worth investigating                      |
 | Operational tradeoff | Evidence tier and manifest controls | Which boundary and deployment were actually measured |
 
-## Compare context and responsibility separately
+## Target capability-fidelity comparison
 
-Do not merge context-placement observations into the latency report. Call
-`diagnostics` with `includeContextStudy: true` through each binding and use the
-identical prompt from the [usage lab](usage-lab.md).
+The redesigned implementation must run the same synthetic user task through
+the complete client plugin and the server-hosted plugin runtime behind the
+company gateway.
 
 Compare:
 
-| Observation               | Local                                                | Remote                                                         |
-| ------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
-| Model and plugin location | Copilot client                                       | Copilot client                                                 |
-| Tool execution            | Learner device                                       | Shared service                                                 |
-| Evidence provenance       | Learner-approved local fixture                       | Operator-curated team fixture                                  |
-| Expected recommendation   | `todo-1`                                             | `todo-3`                                                       |
-| User focus                | Runtime, access, device availability, local evidence | Authentication, disclosure choice, provenance verification     |
-| Operator focus            | Compatible package updates                           | Context governance, security, uptime, scaling, telemetry, cost |
+| Observation            | Complete client plugin         | Plugin behind company MCP                     |
+| ---------------------- | ------------------------------ | --------------------------------------------- |
+| Agent behavior         | Native client implementation   | Fidelity status and server mapping            |
+| Skill workflow         | Native client implementation   | Fidelity status and server mapping            |
+| Hook policy            | Native lifecycle hooks         | Gateway/runtime policy, companion, or loss    |
+| Tools and task outcome | Local capability runtime       | Gateway to server plugin runtime              |
+| Context                | Learner-approved local sources | Operator-governed shared sources              |
+| Approval experience    | Client-native interaction      | Gateway/runtime equivalent or companion       |
+| Updates                | Per-client distribution        | Central runtime deployment                    |
+| Identity and policy    | Local/client controls          | Company gateway controls                      |
+| Availability           | Device and local process       | Network, gateway, and shared runtime          |
+| Failure radius         | Individual user                | Shared service population                     |
+| Evidence               | Local logs and artifacts       | Central provenance and content-free telemetry |
+| Cost                   | Learner device                 | Company infrastructure and operations         |
 
-This cell intentionally changes evidence placement. It demonstrates how useful
-AI behavior can change when a tool reaches different context; it is not a
-transport performance result.
+For every row, record `native`, `mapped`, `companion-required`, or
+`unsupported`. A final matching todo state is insufficient when instructions,
+approvals, errors, or interaction quality changed.
+
+## Make the placement decision
+
+Recommend:
+
+- **client-hosted** when exact client-native behavior, private local context,
+  offline use, or per-user isolation is essential;
+- **server-hosted behind company MCP** when centralized identity, policy,
+  shared systems, governed context, updates, and operations justify fidelity
+  gaps and network dependence; or
+- **hybrid** when specific failed fidelity tests prove that a minimal client
+  companion is still required.
+
+Do not choose hybrid merely to avoid a decision. Every retained client
+component must cite a client-native requirement or failed fidelity test.
 
 ## Do not overclaim
 
-The report does not prove that local is always faster, that remote is
-production-ready, that loopback predicts internet latency, or that remote
-execution makes a model smarter. It shows how to create repeatable evidence,
-how governed context can change a recommendation, and how responsibilities
-move with the execution boundary.
+The current report does not prove that the complete plugin can run behind a
+company MCP layer. It proves only local stdio and direct HTTP tool behavior.
+The redesigned report must not claim success until the gateway, internal
+plugin runtime, capability inventory, and fidelity statuses exist.

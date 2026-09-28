@@ -4,86 +4,72 @@
 
 ## Experiment question
 
-What changes in the AI's available evidence and in the user's responsibilities
-when the **same GitHub Copilot Agent Plugin and MCP tools** execute through a
-local stdio boundary versus a shared Streamable HTTP service?
+What do I gain and lose if I stop distributing a complete Agent Plugin to
+every client and instead run its capability behind my company's MCP layer?
 
-Transport parity first isolates the boundary. A second context-placement cell
-then intentionally supplies different synthetic decision evidence from the
-learner device and the shared service. It still does not compare different
-plugins, tool contracts, or tool implementations.
+The client topology runs the complete plugin on the learner device. The remote
+topology uses a company MCP gateway in front of a server-hosted plugin runtime.
+The experiment must reveal which plugin behaviors survive that move and which
+require mapping, a thin client companion, or an explicit loss.
 
 ## Hypothesis
 
-Both bindings should expose the same client-visible tools and produce the same
-domain outcome. The HTTP boundary should add measurable transport and
-operational overhead, but it also enables centralized deployment,
-observability, server-side integrations, and operator-governed shared context.
-The model itself should remain client-side and unchanged. Its recommendation
-should change only when the evidence available through the tool changes.
+Tool and task outcomes should remain equivalent where the company MCP layer can
+faithfully represent the capability. Client-native agent, skill, hook, local
+context, and approval behaviors might not remain equivalent. Centralized
+identity, policy, updates, shared context, observability, and operations must
+be weighed against those fidelity gaps, network dependence, blast radius, and
+company operating cost.
 
-## Controlled-variable contract
+## Capability-fidelity contract
 
-| Held constant                          | Allowed to change                       |
-| -------------------------------------- | --------------------------------------- |
-| Plugin identity and version            | MCP transport: stdio or Streamable HTTP |
-| Agent, skill, and hook payload         | Process or network boundary             |
-| Tool names, descriptions, and schemas  | Boundary-specific failure category      |
-| Shared tool registration and todo core | Transport latency                       |
-| Synthetic scenario and run ordering    | Optional auth only in its separate cell |
-| Warm, in-memory, one-replica baseline  | Azure operations only for `live-aca`    |
+Hold the synthetic user task, intended capability, domain rules, and expected
+business outcome constant. Allow the implementation topology to differ.
 
-If another row changes, the result belongs in a separate experiment cell and
-must not be merged into the baseline.
+For every agent instruction, skill step, hook policy, tool, context source,
+approval, error, and telemetry behavior, record one status:
 
-## Context-placement cell
+- **native:** preserved without adaptation;
+- **mapped:** represented through an MCP or company-layer contract;
+- **companion-required:** needs a thin client component; or
+- **unsupported:** cannot be preserved in the target topology.
 
-The separate context-placement cell calls the same `diagnostics` tool with
-`includeContextStudy: true`. The local response contains a synthetic,
-learner-approved focus signal. The remote response contains a synthetic,
-operator-curated team policy. The model can therefore reach a different
-recommendation without changing the plugin, agent, skill, model, or tool
-implementation.
-
-This is the learning distinction:
-
-- **AI capability** comes from the model plus the tool contract.
-- **Useful intelligence** depends on the evidence the tool can retrieve and
-  the provenance the user can evaluate.
-- **Responsibility** follows the evidence and execution boundary.
+A missing behavior without an explicit status is a failed experiment.
 
 ## Evidence chain
 
-| Surface    | What to inspect                                                     | What it teaches or proves                                                                                                          |
-| ---------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Source     | `packages/README.md` and `packages/mcp-server/src/create-server.ts` | Both adapters use one tool-registration factory; the context cell exposes boundary-specific evidence and responsibility provenance |
-| Bindings   | `plugins/local/mcp.json` and `plugins/remote/mcp.json`              | Only the MCP connection changes in generated packages                                                                              |
-| Tests      | `test/contract/experiment-invariant.integration.test.ts`            | Real stdio and HTTP clients reach the same domain outcome                                                                          |
-| Tests      | `test/architecture/plugin-comparison.test.ts`                       | Generated package bytes may differ only in `mcp.json`                                                                              |
-| Runner     | `packages/experiment-runner/src/cli.ts`                             | Alternating paired execution and evidence-tier labeling                                                                            |
-| Videos     | `docs/media/videos/`                                                | A visual explanation of boundary, parity, latency, and recovery                                                                    |
-| Deployment | `infra/main.bicep`                                                  | The remote boundary adds ACA, identity, registry, logs, ingress, and cost                                                          |
-| Manifest   | `artifacts/experiments/<cell>.json`                                 | Auditable controls, environment, ordering, and measurements                                                                        |
+| Surface              | What to inspect                                                                                     | What it teaches or proves |
+| -------------------- | --------------------------------------------------------------------------------------------------- | ------------------------- |
+| Surface              | Target evidence                                                                                     |
+| ---                  | ---                                                                                                 |
+| Capability source    | One inventory maps every plugin behavior to client and server realizations                          |
+| Client topology      | Complete plugin package runs without the company gateway                                            |
+| Remote topology      | Public company MCP gateway fronts a non-public plugin runtime                                       |
+| Fidelity tests       | Task outcome plus agent, skill, hook, context, approval, error, and provenance behavior             |
+| Responsibility tests | User and operator duties are explicit for updates, identity, data, reliability, telemetry, and cost |
+| Videos               | Capability retained, capability lost, company governance gained, and hybrid decision                |
+| Deployment           | Gateway and internal runtime have distinct identities, ingress, revisions, and evidence             |
+| Decision scorecard   | Evidence supports client, server, or hybrid rather than assuming one answer                         |
 
 ## Success criteria
 
 After the lab, verify that you can answer:
 
-1. Which code and package files are identical between local and remote?
-1. What is the one intended variable in the baseline?
-1. Why is loopback HTTP useful but not Azure deployment evidence?
-1. Which result demonstrates behavioral parity?
-1. Which new failure, security, scaling, and cost concerns appear remotely?
-1. Why can the same client-side model make a different recommendation in the
-   context-placement cell?
-1. Which responsibilities stay with the user, and which transfer to a service
-   operator?
-1. Which evidence would you need before making a production decision?
+1. Which parts of the complete plugin remain faithful behind company MCP?
+1. Which parts require mapping, a thin companion, or an accepted loss?
+1. What centralized context, policy, update, and observability value is gained?
+1. What local context, offline behavior, interaction quality, or autonomy is
+   lost?
+1. Which responsibilities transfer from the user to the company operator?
+1. What new shared failure domain, security boundary, latency, and cost appear?
+1. Should the capability be client-hosted, server-hosted behind company MCP,
+   or hybrid?
 
 ## Limits of the evidence
 
-- The fixture and loopback results are deterministic learning evidence, not a
-  production benchmark.
+- The current fixture and loopback implementation proves only a lower-level
+  transport baseline. It does not yet implement the target company gateway and
+  server-hosted plugin runtime.
 - The videos visualize sanitized evidence; they do not record a native Copilot
   client or Azure portal.
 - A `live-aca` report proves only the queried deployment and controls recorded
@@ -92,6 +78,5 @@ After the lab, verify that you can answer:
   statistical superiority.
 - In-memory, single-replica behavior intentionally excludes persistence and
   horizontal scaling from the baseline.
-- The context-placement evidence is synthetic. It demonstrates provenance and
-  responsibility shifts, not the quality of a real organizational knowledge
-  base.
+- The future company layer remains representative and synthetic; it cannot
+  prove compatibility with a proprietary enterprise MCP implementation.
