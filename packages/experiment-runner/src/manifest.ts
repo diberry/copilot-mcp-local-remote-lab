@@ -13,11 +13,13 @@ export const ExperimentManifestSchema = z
     remoteBundleSha256: sha,
     localBindingSha256: sha,
     remoteBindingSha256: sha,
+    serverArtifactSha256: sha,
     sourceCommit: z.string(),
     evidenceTier: z.enum(["remote-test", "live-aca"]),
     remoteEndpoint: z.enum(["loopback", "deployed-aca"]),
     azureResourceGroup: z.string().nullable(),
     azureContainerAppName: z.string().nullable(),
+    azureRuntimeAppName: z.string().nullable(),
     azureSubscriptionVerified: z.literal(true).nullable(),
     remoteEndpointHost: z.string().nullable(),
     remoteEndpointUrl: z.string().nullable(),
@@ -27,6 +29,13 @@ export const ExperimentManifestSchema = z
       .string()
       .regex(/^[a-z0-9][a-z0-9.-]*$/i)
       .nullable(),
+    runtimeImageReference: z.string().nullable(),
+    runtimeImageDigest: imageDigest.nullable(),
+    runtimeRevision: z
+      .string()
+      .regex(/^[a-z0-9][a-z0-9.-]*$/i)
+      .nullable(),
+    runtimeInternalHost: z.string().nullable(),
     protocolVersion: z.string(),
     copilotClientVersion: z.string(),
     nodeVersion: z.string(),
@@ -55,12 +64,17 @@ export const ExperimentManifestSchema = z
       (manifest.remoteEndpoint !== "loopback" ||
         manifest.azureResourceGroup !== null ||
         manifest.azureContainerAppName !== null ||
+        manifest.azureRuntimeAppName !== null ||
         manifest.azureSubscriptionVerified !== null ||
         manifest.remoteEndpointHost !== null ||
         manifest.remoteEndpointUrl !== null ||
         manifest.remoteImageReference !== null ||
         manifest.remoteImageDigest !== null ||
         manifest.acaRevision !== null ||
+        manifest.runtimeImageReference !== null ||
+        manifest.runtimeImageDigest !== null ||
+        manifest.runtimeRevision !== null ||
+        manifest.runtimeInternalHost !== null ||
         manifest.azureRegion !== null)
     )
       context.addIssue({
@@ -73,11 +87,15 @@ export const ExperimentManifestSchema = z
       (manifest.remoteEndpoint !== "deployed-aca" ||
         !manifest.azureResourceGroup ||
         !manifest.azureContainerAppName ||
+        !manifest.azureRuntimeAppName ||
         manifest.azureSubscriptionVerified !== true ||
         !manifest.remoteEndpointHost ||
         !manifest.remoteEndpointUrl ||
         !manifest.remoteImageReference ||
         !manifest.acaRevision ||
+        !manifest.runtimeImageReference ||
+        !manifest.runtimeRevision ||
+        !manifest.runtimeInternalHost ||
         !manifest.azureRegion)
     )
       context.addIssue({

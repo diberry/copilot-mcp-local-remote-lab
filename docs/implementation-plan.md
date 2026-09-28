@@ -113,9 +113,11 @@ plugin-placement parity.
 
 ### Stage 2: define the capability inventory
 
+**Status:** Implemented.
+
 **Output:**
 
-- Add `packages/plugin-capability/` as the canonical source.
+- Use `packages/plugin-capability/` as the canonical executable source.
 - Inventory agent behavior, skill steps, hook policies, tools, context,
   approvals, errors, and telemetry.
 - Add a machine-readable fidelity schema with statuses `native`, `mapped`,
@@ -126,9 +128,12 @@ expected outcome, and topology mapping.
 
 ### Stage 3: build the complete client-hosted reference
 
+**Status:** Implemented.
+
 **Output:**
 
-- Generate the installable client package from `plugin-capability`.
+- Build one executable artifact from `plugin-capability`; load that artifact
+  from the installable client package.
 - Keep the local runtime, agent, skill, hooks, and approved local context on
   the learner device.
 - Capture task outcomes and client-native lifecycle evidence.
@@ -137,6 +142,9 @@ expected outcome, and topology mapping.
 the complete package without the company gateway.
 
 ### Stage 4: build the company MCP boundary
+
+**Status:** Implemented locally and in Bicep; no Azure resources are deployed
+by validation.
 
 **Output:**
 
@@ -152,6 +160,10 @@ the runtime; unauthorized and cross-tenant fixtures fail closed.
 
 ### Stage 5: map plugin behavior into the server runtime
 
+**Status:** Implemented with explicit fidelity results. Client-native agent and
+skill surfaces remain `unsupported` behind MCP rather than silently passing;
+local context and approvals are `companion-required`.
+
 **Output:**
 
 - Execute portable agent instructions and skill workflow in the server runtime.
@@ -164,6 +176,9 @@ the runtime; unauthorized and cross-tenant fixtures fail closed.
 no missing feature silently passes.
 
 ### Stage 6: run the decision experiment
+
+**Status:** Implemented for fixture and loopback evidence. Live Azure evidence
+still requires separate deployment authorization.
 
 **Output:** Compare client-hosted, server-hosted-behind-MCP, and hybrid
 topologies using the same synthetic task and evidence rubric.
@@ -185,6 +200,9 @@ hybrid from explicit evidence rather than a transport preference.
 
 ### Stage 7: deploy the representative company layer
 
+**Status:** Deployment definition implemented; deployment intentionally not
+performed.
+
 **Output:** Use `azd` and Bicep to deploy an externally reachable gateway and
 an internal plugin runtime to Azure Container Apps.
 
@@ -193,6 +211,8 @@ images, revisions, identity, policy profile, region, scaling, and cleanup
 result. No deployment occurs without separate authorization.
 
 ### Stage 8: complete the learning experience
+
+**Status:** Implemented in source, docs, tests, and video narratives.
 
 **Output:** Rewrite the guided lab, architecture diagrams, responsibility
 matrix, videos, and troubleshooting around the placement decision.

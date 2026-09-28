@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "node scripts/clean.mjs",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run plugin:build && npm run plugin:validate && npm run plugin:compare && npm run test:discovery-parity && npm run experiment:verify-manifest && npm run verify:no-secrets && npm run verify:boundaries && npm run docs:check",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run plugin:build && npm test && npm run plugin:validate && npm run plugin:compare && npm run plugin:verify-reuse && npm run test:discovery-parity && npm run experiment:verify-manifest && npm run verify:no-secrets && npm run verify:boundaries && npm run docs:check",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -24,6 +24,7 @@
     "plugin:build": "npm run build && node scripts/build-plugin.mjs",
     "plugin:validate": "node scripts/check-generated.mjs",
     "plugin:compare": "node scripts/compare-plugin.mjs --verify-inventories",
+    "plugin:verify-reuse": "node scripts/verify-artifact-reuse.mjs",
     "test:discovery-parity": "node scripts/compare-discovery.mjs",
     "experiment:run": "npm run plugin:build && node scripts/run-comparison.mjs",
     "experiment:verify-manifest": "node scripts/verify-experiment-manifest.mjs",

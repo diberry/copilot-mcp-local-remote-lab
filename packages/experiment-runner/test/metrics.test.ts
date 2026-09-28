@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { proveBearerEnforcement } from "../src/auth-proof.js";
-import { parseAcaResourceEvidence } from "../src/azure-evidence.js";
+import {
+  parseAcaResourceEvidence,
+  parseAcaRuntimeEvidence,
+} from "../src/azure-evidence.js";
 import { withCleanup } from "../src/cleanup.js";
 import { median, p95 } from "../src/metrics.js";
 import {
@@ -30,10 +33,7 @@ const acaEnvironment: Array<{
   name: string;
   value?: string;
   secretRef?: string;
-}> = [
-  { name: "ALLOWED_ORIGINS", value: "https://copilot.local" },
-  { name: "STORAGE_MODE", value: "memory" },
-];
+}> = [{ name: "ALLOWED_ORIGINS", value: "https://copilot.local" }];
 const acaResource = {
   id: `/subscriptions/${acaRequest.subscription}/resourceGroups/rg-lab/providers/Microsoft.App/containerApps/ca-lab`,
   name: "ca-lab",
@@ -44,17 +44,49 @@ const acaResource = {
     latestReadyRevisionName: "ca-lab--revision1",
     configuration: {
       activeRevisionsMode: "Single",
-      ingress: { fqdn: "lab.westus2.azurecontainerapps.io" },
+      ingress: { fqdn: "lab.westus2.azurecontainerapps.io", external: true },
     },
     template: {
       containers: [
         {
-          name: "mcp",
+          name: "company-mcp-gateway",
           image: `acr.azurecr.io/mcp@sha256:${"a".repeat(64)}`,
           env: acaEnvironment,
         },
       ],
       scale: { minReplicas: 1, maxReplicas: 1 },
+    },
+  },
+};
+const runtimeResource = {
+  ...structuredClone(acaResource),
+  name: "ca-lab-runtime",
+  id: `/subscriptions/${acaRequest.subscription}/resourceGroups/rg-lab/providers/Microsoft.App/containerApps/ca-lab-runtime`,
+  properties: {
+    ...structuredClone(acaResource.properties),
+    latestRevisionName: "ca-lab-runtime--revision1",
+    latestReadyRevisionName: "ca-lab-runtime--revision1",
+    configuration: {
+      activeRevisionsMode: "Single",
+      ingress: {
+        fqdn: "ca-lab-runtime.internal.azurecontainerapps.io",
+        external: false,
+      },
+    },
+    template: {
+      ...structuredClone(acaResource.properties.template),
+      containers: [
+        {
+          name: "plugin-runtime",
+          image: `acr.azurecr.io/runtime@sha256:${"b".repeat(64)}`,
+          env: [
+            {
+              name: "PLUGIN_ARTIFACT_ROOT",
+              value: "/app/artifacts/plugin/runtime",
+            },
+          ],
+        },
+      ],
     },
   },
 };
@@ -170,6 +202,18 @@ describe("experiment controls", () => {
         authMode: "bearer",
       }),
     ).not.toThrow();
+    expect(
+      parseAcaRuntimeEvidence(runtimeResource, {
+        resourceGroup: "rg-lab",
+        appName: "ca-lab-runtime",
+        subscription: acaRequest.subscription,
+      }),
+    ).toMatchObject({
+      azureRuntimeAppName: "ca-lab-runtime",
+      runtimeImageDigest: `sha256:${"b".repeat(64)}`,
+      runtimeRevision: "ca-lab-runtime--revision1",
+      runtimeInternalHost: "ca-lab-runtime.internal.azurecontainerapps.io",
+    });
   });
   it("fails closed when Azure resource controls do not match", () => {
     expect(() =>
@@ -211,12 +255,15 @@ describe("experiment controls", () => {
     expect(() => parseAcaResourceEvidence(wrongOrigin, acaRequest)).toThrow(
       "allowed Origin",
     );
-    const wrongStorage = structuredClone(acaResource);
-    wrongStorage.properties.template.containers[0]!.env[1]!.value =
-      "optional-persistence";
-    expect(() => parseAcaResourceEvidence(wrongStorage, acaRequest)).toThrow(
-      "storage mode",
-    );
+    const publicRuntime = structuredClone(runtimeResource);
+    publicRuntime.properties.configuration.ingress.external = true;
+    expect(() =>
+      parseAcaRuntimeEvidence(publicRuntime, {
+        resourceGroup: "rg-lab",
+        appName: "ca-lab-runtime",
+        subscription: acaRequest.subscription,
+      }),
+    ).toThrow("ingress");
   });
   it("records and validates sanitized live ACA endpoint identity", () => {
     const liveManifest = {
@@ -225,12 +272,17 @@ describe("experiment controls", () => {
       remoteEndpoint: "deployed-aca",
       azureResourceGroup: "rg-lab",
       azureContainerAppName: "ca-lab",
+      azureRuntimeAppName: "ca-lab-runtime",
       azureSubscriptionVerified: true,
       remoteEndpointHost: "lab.westus2.azurecontainerapps.io",
       remoteEndpointUrl: "https://lab.westus2.azurecontainerapps.io/mcp",
       remoteImageReference: `acr.azurecr.io/mcp@sha256:${"a".repeat(64)}`,
       remoteImageDigest: `sha256:${"a".repeat(64)}`,
       acaRevision: "lab--revision1",
+      runtimeImageReference: `acr.azurecr.io/runtime@sha256:${"b".repeat(64)}`,
+      runtimeImageDigest: `sha256:${"b".repeat(64)}`,
+      runtimeRevision: "runtime--revision1",
+      runtimeInternalHost: "runtime.internal.azurecontainerapps.io",
       azureRegion: "westus2",
     };
     expect(() => ExperimentManifestSchema.parse(liveManifest)).not.toThrow();

@@ -7,8 +7,8 @@ least 20 seconds and presents six steps: context, action, evidence, and a clear
 takeaway.
 
 1. [Two plugin placements](./01-execution-boundary.webm) — compares a complete
-   client-installed plugin with a server-hosted plugin runtime behind a company
-   MCP gateway.
+   client-installed plugin with the exact same executable artifact loaded by a
+   private runtime behind a company MCP gateway.
 1. [Capability fidelity](./02-equivalent-tool-flow.webm) — explains `native`,
    `mapped`, `companion-required`, and `unsupported` evidence.
 1. [Company value and cost](./03-latency-cold-warm.webm) — balances shared

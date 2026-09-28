@@ -7,6 +7,7 @@ param registryServer string
 param imageName string
 param minReplicas int
 param allowedOrigin string
+param pluginRuntimeUrl string
 @secure()
 param mcpBearerToken string
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
@@ -26,13 +27,13 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
     }
     template: {
       containers: [{
-        name: 'mcp'
+        name: 'company-mcp-gateway'
         image: imageName
         env: concat([
             { name: 'HOST', value: '0.0.0.0' }
             { name: 'PORT', value: '3000' }
             { name: 'ALLOWED_ORIGINS', value: allowedOrigin }
-            { name: 'STORAGE_MODE', value: 'memory' }
+            { name: 'PLUGIN_RUNTIME_URL', value: pluginRuntimeUrl }
           ], empty(mcpBearerToken) ? [] : [
             { name: 'MCP_BEARER_TOKEN', secretRef: 'mcp-bearer-token' }
         ])

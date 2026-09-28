@@ -17,22 +17,40 @@ export async function comparePluginTrees(
   ]);
   const localPaths = local.map(({ path }) => path);
   const remotePaths = remote.map(({ path }) => path);
-  if (JSON.stringify(localPaths) !== JSON.stringify(remotePaths))
-    throw new Error("Generated plugin file lists differ.");
+  for (const required of [
+    "artifact.json",
+    "dist/plugin/capability.js",
+    "dist/plugin/stdio.js",
+  ])
+    if (!localPaths.includes(required))
+      throw new Error(`Local plugin is missing ${required}.`);
+  for (const forbidden of [
+    "artifact.json",
+    "dist/plugin/capability.js",
+    "dist/plugin/stdio.js",
+  ])
+    if (remotePaths.includes(forbidden))
+      throw new Error(
+        `Remote connection contains executable plugin: ${forbidden}`,
+      );
+  if (!remotePaths.includes("server-artifact.json"))
+    throw new Error(
+      "Remote connection is missing server artifact attestation.",
+    );
 
-  const localMap = new Map(local.map((item) => [item.path, item.sha256]));
-  const remoteMap = new Map(remote.map((item) => [item.path, item.sha256]));
-  const differences = localPaths.filter(
-    (path) => localMap.get(path) !== remoteMap.get(path),
-  );
-  if (differences.length !== 1 || differences[0] !== "mcp.json")
-    throw new Error(`Unexpected bundle differences: ${differences.join(", ")}`);
-
-  const [localPlugin, remotePlugin] = await Promise.all(
-    [localDirectory, remoteDirectory].map((directory) =>
-      readFile(resolve(directory, "plugin.json"), "utf8").then(JSON.parse),
-    ),
-  );
+  const [localPlugin, remotePlugin, localArtifact, remoteAttestation] =
+    await Promise.all([
+      readFile(resolve(localDirectory, "plugin.json"), "utf8").then(JSON.parse),
+      readFile(resolve(remoteDirectory, "plugin.json"), "utf8").then(
+        JSON.parse,
+      ),
+      readFile(resolve(localDirectory, "artifact.json"), "utf8").then(
+        JSON.parse,
+      ),
+      readFile(resolve(remoteDirectory, "server-artifact.json"), "utf8").then(
+        JSON.parse,
+      ),
+    ]);
   const expectedIdentity = identity(expectedPlugin);
   if (
     expectedPlugin.name !== "copilot-mcp-local-remote-lab" ||
@@ -46,6 +64,10 @@ export async function comparePluginTrees(
     throw new Error(
       `Plugin identity/version mismatch; expected ${expectedIdentity}.`,
     );
+  if (localArtifact.payloadSha256 !== remoteAttestation.payloadSha256)
+    throw new Error("Remote connection attests a different plugin artifact.");
+  if (remotePlugin.skills !== undefined || remotePlugin.hooks !== undefined)
+    throw new Error("Remote connection contains client plugin behavior.");
 
   if (verifyInventories) {
     if (!inventoryDirectory)
@@ -66,7 +88,11 @@ export async function comparePluginTrees(
         "External plugin inventory does not match generated files.",
       );
   }
-  return { fileCount: localPaths.length, differences };
+  return {
+    localFileCount: localPaths.length,
+    remoteFileCount: remotePaths.length,
+    artifactSha256: localArtifact.payloadSha256,
+  };
 }
 
 async function main() {
@@ -79,7 +105,7 @@ async function main() {
     },
   );
   console.log(
-    `Compared ${result.fileCount} generated files directly: only mcp.json differs.`,
+    `Verified local execution and remote connection placement for plugin artifact ${result.artifactSha256}.`,
   );
 }
 

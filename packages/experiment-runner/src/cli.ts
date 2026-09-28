@@ -5,9 +5,13 @@ import {
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { createHttpApp } from "../../mcp-server/src/http.js";
+import { createGatewayApp } from "../../company-mcp-gateway/src/http.js";
+import { createRuntimeApp } from "../../server-plugin-runtime/src/http.js";
 import { proveBearerEnforcement } from "./auth-proof.js";
-import { queryAcaResourceEvidence } from "./azure-evidence.js";
+import {
+  queryAcaResourceEvidence,
+  queryAcaRuntimeEvidence,
+} from "./azure-evidence.js";
 import { withCleanup } from "./cleanup.js";
 import {
   experimentArtifactPath,
@@ -33,31 +37,46 @@ const authMode = resolveAuthMode(process.env.MCP_BEARER_TOKEN);
 let resourceEvidence;
 if (remoteTarget.evidenceTier === "live-aca") {
   const resourceGroup = process.env.ACA_RESOURCE_GROUP;
-  const appName = process.env.ACA_APP_NAME;
-  if (!resourceGroup || !appName)
+  const appName = process.env.ACA_GATEWAY_APP_NAME;
+  const runtimeAppName = process.env.ACA_RUNTIME_APP_NAME;
+  if (!resourceGroup || !appName || !runtimeAppName)
     throw new Error(
-      "ACA_RESOURCE_GROUP and ACA_APP_NAME are required for live-aca evidence.",
+      "ACA_RESOURCE_GROUP, ACA_GATEWAY_APP_NAME, and ACA_RUNTIME_APP_NAME are required for live-aca evidence.",
     );
-  resourceEvidence = await queryAcaResourceEvidence({
+  const common = {
     resourceGroup,
-    appName,
     ...(process.env.AZURE_SUBSCRIPTION_ID
       ? { subscription: process.env.AZURE_SUBSCRIPTION_ID }
       : {}),
-    endpoint: remoteTarget.url,
-    origin: experimentOrigin,
-    authMode,
-  });
+  };
+  resourceEvidence = {
+    ...(await queryAcaResourceEvidence({
+      ...common,
+      appName,
+      endpoint: remoteTarget.url,
+      origin: experimentOrigin,
+      authMode,
+    })),
+    ...(await queryAcaRuntimeEvidence({
+      ...common,
+      appName: runtimeAppName,
+    })),
+  };
 } else {
   resourceEvidence = {
     azureResourceGroup: null,
     azureContainerAppName: null,
+    azureRuntimeAppName: null,
     azureSubscriptionVerified: null,
     remoteEndpointHost: null,
     remoteEndpointUrl: null,
     remoteImageReference: null,
     remoteImageDigest: null,
     acaRevision: null,
+    runtimeImageReference: null,
+    runtimeImageDigest: null,
+    runtimeRevision: null,
+    runtimeInternalHost: null,
     azureRegion: null,
   };
 }
@@ -89,31 +108,64 @@ const report = await withCleanup(async (cleanup) => {
   const local: number[] = [];
   const remote: number[] = [];
   const pairs = [];
-  const app =
-    remoteTarget.evidenceTier === "remote-test" ? createHttpApp() : undefined;
-  if (app) {
+  const runtime =
+    remoteTarget.evidenceTier === "remote-test"
+      ? await createRuntimeApp()
+      : undefined;
+  if (runtime) {
     await new Promise<void>((resolveListen, rejectListen) => {
       const onError = (error: Error) => rejectListen(error);
-      app.once("error", onError);
-      app.listen(0, "127.0.0.1", () => {
-        app.off("error", onError);
+      runtime.once("error", onError);
+      runtime.listen(0, "127.0.0.1", () => {
+        runtime.off("error", onError);
         resolveListen();
       });
     });
     cleanup.defer(
       () =>
         new Promise<void>((resolveClose, rejectClose) => {
-          if (!app.listening) return resolveClose();
-          app.close((error) => (error ? rejectClose(error) : resolveClose()));
+          if (!runtime.listening) return resolveClose();
+          runtime.close((error) =>
+            error ? rejectClose(error) : resolveClose(),
+          );
         }),
     );
   }
-  const address = app?.address();
-  if (app && (!address || typeof address === "string"))
-    throw new Error("Loopback HTTP adapter did not start.");
+  const runtimeAddress = runtime?.address();
+  if (runtime && (!runtimeAddress || typeof runtimeAddress === "string"))
+    throw new Error("Loopback plugin runtime did not start.");
+  const gateway = runtime
+    ? createGatewayApp(
+        `http://127.0.0.1:${(runtimeAddress as { port: number }).port}/internal/mcp`,
+      )
+    : undefined;
+  if (gateway) {
+    await new Promise<void>((resolveListen, rejectListen) => {
+      const onError = (error: Error) => rejectListen(error);
+      gateway.once("error", onError);
+      gateway.listen(0, "127.0.0.1", () => {
+        gateway.off("error", onError);
+        resolveListen();
+      });
+    });
+    cleanup.defer(
+      () =>
+        new Promise<void>((resolveClose, rejectClose) => {
+          if (!gateway.listening) return resolveClose();
+          gateway.close((error) =>
+            error ? rejectClose(error) : resolveClose(),
+          );
+        }),
+    );
+  }
+  const gatewayAddress = gateway?.address();
+  if (gateway && (!gatewayAddress || typeof gatewayAddress === "string"))
+    throw new Error("Loopback company MCP gateway did not start.");
   const remoteUrl =
     remoteTarget.url ??
-    new URL(`http://127.0.0.1:${(address as { port: number }).port}/mcp`);
+    new URL(
+      `http://127.0.0.1:${(gatewayAddress as { port: number }).port}/mcp`,
+    );
 
   const localClient = new Client({
     name: "experiment-local",

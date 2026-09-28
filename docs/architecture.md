@@ -56,19 +56,26 @@ trust or reject returned evidence.
 
 ```mermaid
 flowchart TB
-  D[Canonical capability definition] --> C[Client Agent Plugin adapter]
-  D --> S[Server plugin-runtime adapter]
+  D[Complete built plugin artifact] --> C[Client artifact loader]
+  D --> S[Server artifact loader]
   C --> CP[Complete client package]
-  S --> G[Company MCP gateway]
-  D --> F[Fidelity inventory]
+  S --> R[Private plugin runtime]
+  R --> G[Company MCP gateway]
+  D --> F[Machine-readable fidelity inventory]
   CP --> F
   G --> F
 ```
 
-The canonical capability definition records tool behavior, agent intent, skill
-workflow, hook policy, context requirements, approvals, errors, and telemetry.
-The adapters may produce different artifacts. Byte identity is not the target.
-Every capability must instead receive one fidelity status:
+`scripts/build-plugin.mjs` builds the executable artifact once. It copies that
+artifact without recompilation to `plugins/local` and
+`artifacts/plugin/runtime`. Both loaders verify `artifact.json`; the remote
+connection contains only `mcp.json`, `plugin.json`, and
+`server-artifact.json`. The gateway and runtime are forbidden from importing
+`plugin-capability` or `todo-core` source.
+
+The artifact also carries `capability/fidelity.json`, which records tool
+behavior, agent intent, skill workflow, hook policy, context requirements,
+approvals, errors, and telemetry. Every capability has one fidelity status:
 
 - `native`;
 - `mapped`;
@@ -79,14 +86,14 @@ The hybrid topology is not assumed. It is selected only when a fidelity test
 shows that valuable client-native behavior cannot cross MCP or when local and
 offline context is a requirement.
 
-## Implementation stages
+## Executable boundaries
 
-The transport foundation builds one client plugin with local and remote MCP
-bindings. Its custom agent, skill, and hooks remain client-side in those
-transport exercises, and the HTTP adapter directly hosts the tools.
-
-The placement stages add the canonical capability inventory, complete client
-package, company MCP gateway, server-hosted plugin runtime, and
-capability-fidelity report described in the
-[implementation plan](implementation-plan.md). Together, the stages form one
-lab and one evidence chain.
+- `packages/plugin-capability` is compiled once into the plugin artifact.
+- `packages/client-plugin-adapter` loads that artifact on the learner device.
+- `packages/server-plugin-runtime` loads the same artifact from a non-public
+  Container App.
+- `packages/company-mcp-gateway` never imports plugin implementation code. It
+  authenticates, applies boundary policy, proxies MCP, and emits content-free
+  operational telemetry.
+- `scripts/verify-artifact-reuse.mjs` proves byte identity and rejects source
+  coupling.

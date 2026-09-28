@@ -17,4 +17,11 @@
 | Bicep CLI observed           | 0.39.26                       |
 | Docker CLI observed          | 29.1.3                        |
 
-Server environment variables: `PORT` (default 3000), `HOST` (default `0.0.0.0`), `ALLOWED_ORIGINS` (set by Bicep `allowedOrigin`, default `https://copilot.local`), `STORAGE_MODE=memory`, and optional `MCP_BEARER_TOKEN` (secure Bicep parameter and ACA secret reference). Runner variables include `EXPERIMENT_CELL` (`baseline` or `authentication`), `EXPERIMENT_ORIGIN` (default `https://copilot.local` for live ACA), required live resource identity `ACA_RESOURCE_GROUP` and `ACA_APP_NAME`, and optional `AZURE_SUBSCRIPTION_ID`. Live metadata is queried from Azure rather than accepted from environment variables. Do not print values. `REMOTE_MCP_URL` is accepted only by bundle generation and must be credential-free HTTPS.
+Gateway variables are `PORT` (default `3000`), `HOST`,
+`ALLOWED_ORIGINS`, `PLUGIN_RUNTIME_URL`, and optional `MCP_BEARER_TOKEN`.
+Runtime variables are `PORT` (default `3001`), `HOST`, and
+`PLUGIN_ARTIFACT_ROOT`. Runner variables include `EXPERIMENT_CELL`,
+`EXPERIMENT_ORIGIN`, `ACA_RESOURCE_GROUP`, `ACA_GATEWAY_APP_NAME`,
+`ACA_RUNTIME_APP_NAME`, and optional `AZURE_SUBSCRIPTION_ID`. Do not print
+secret values. `REMOTE_MCP_URL` is accepted only by connection-bundle
+generation and must be credential-free HTTPS.

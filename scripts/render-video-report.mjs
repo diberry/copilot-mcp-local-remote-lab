@@ -30,6 +30,9 @@ const localEvidence = fixtures["local-run.json"];
 const discoveryEvidence = JSON.parse(
   await readFile("artifacts/discovery/summary.json", "utf8"),
 );
+const artifactEvidence = JSON.parse(
+  await readFile("artifacts/plugin-inventory/summary.json", "utf8"),
+);
 const pluginEvidence = validateVideoFixturePair(
   localEvidence,
   remoteEvidence,
@@ -91,12 +94,12 @@ const scenes = [
       ],
       [
         "Company topology",
-        "Place the plugin runtime behind MCP",
-        "A company gateway authenticates, authorizes, applies policy, and routes to a non-public plugin runtime.",
-        "PUBLIC BOUNDARY",
-        "Company MCP gateway",
-        "BEHIND IT",
-        "Server plugin runtime",
+        "Load the same artifact behind MCP",
+        "The remote client has connection metadata only. The private runtime loads the exact artifact bytes used by the local client.",
+        "ARTIFACT SHA-256",
+        artifactEvidence.serverArtifactSha256.slice(0, 16),
+        "PUBLIC PATH",
+        "Gateway → private runtime",
       ],
       [
         "Company ownership",
@@ -318,7 +321,7 @@ await writeFile("artifacts/video-report/index.html", html);
 for (const { id, title, description, steps } of scenes)
   await writeFile(
     `artifacts/videos/transcripts/${id}.txt`,
-    `${title}\n\n${description}\n\n${steps.map((step, index) => `Step ${index + 1}: ${step[1]}\n${step[2]}\n${step[3]}: ${step[4]}. ${step[5]}: ${step[6]}.`).join("\n\n")}\n\nEvidence note: This storyboard uses sanitized ${remoteEvidence.evidenceTier} fixture evidence over ${boundaryLabel}. Plugin ${pluginEvidence.pluginVersion} exposes ${pluginEvidence.toolCount} tools with discovery SHA-256 ${pluginEvidence.discoverySha256}.\n`,
+    `${title}\n\n${description}\n\n${steps.map((step, index) => `Step ${index + 1}: ${step[1]}\n${step[2]}\n${step[3]}: ${step[4]}. ${step[5]}: ${step[6]}.`).join("\n\n")}\n\nEvidence note: This storyboard uses sanitized ${remoteEvidence.evidenceTier} fixture evidence over ${boundaryLabel}. Plugin ${pluginEvidence.pluginVersion} exposes ${pluginEvidence.toolCount} tools with discovery SHA-256 ${pluginEvidence.discoverySha256}. The client and company runtime load executable artifact SHA-256 ${artifactEvidence.serverArtifactSha256}; the remote client carries only its attestation.\n`,
   );
 await writeFile(
   "artifacts/videos/descriptions.json",

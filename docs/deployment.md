@@ -6,16 +6,16 @@ Deployment is separate from validation. `npm run check`, the default experiment,
 
 The deployment stage uses two distinct components: a public representative
 company MCP gateway and a non-public server-hosted plugin runtime behind it.
-The transport stage can deploy its single MCP service independently as
-supporting protocol evidence.
+The two services are built from separate Dockerfiles and use distinct managed
+identities.
 
 ## Company-layer deployment
 
-| Component                 | Target responsibility                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Company MCP gateway       | Public MCP endpoint, identity, authorization, policy, routing, rate limits, and content-free telemetry |
-| Server plugin runtime     | Canonical capability execution, shared context access, workflow, policy mappings, and provenance       |
-| Client connection surface | Endpoint and authentication configuration only, plus a thin companion if fidelity tests require one    |
+| Component                 | Target responsibility                                                                                     |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Company MCP gateway       | Public MCP endpoint, identity, authorization, policy, routing, rate limits, and content-free telemetry    |
+| Server plugin runtime     | Loads the complete built plugin artifact, executes its portable capability, and reports its artifact hash |
+| Client connection surface | Endpoint and authentication configuration only, plus a thin companion if fidelity tests require one       |
 
 The gateway must be the only public path to the runtime. Direct runtime access
 must fail. Azure evidence must bind both components, their identities, images,
@@ -36,9 +36,16 @@ adds the real operational boundary:
 | Optional bearer secret             | Measure authentication in a distinct experiment cell                   |
 | Operator-governed context boundary | Study provenance, freshness, authorization, retention, and user trust  |
 
-`azd provision` deploys a Log Analytics workspace, managed Container Apps environment, ACR, user-assigned identity with AcrPull, and externally accessible Container App. Bicep owns configuration.
+`azd provision` deploys a Log Analytics workspace, managed Container Apps
+environment, ACR, two user-assigned identities with AcrPull, an externally
+accessible gateway Container App, and an internal-ingress runtime Container
+App. Bicep owns configuration.
 
-The `allowedOrigin` Bicep parameter defaults to `https://copilot.local` and is passed to the container as `ALLOWED_ORIGINS`. Bicep also fixes `STORAGE_MODE=memory` and `maxReplicas=1`; live evidence additionally requires the warm `minReplicas=1` profile. Keep origin validation enabled. If you override the parameter, use the exact same HTTPS origin as `EXPERIMENT_ORIGIN` when running live evidence.
+The `allowedOrigin` Bicep parameter defaults to `https://copilot.local` and is
+passed only to the gateway as `ALLOWED_ORIGINS`. Bicep sets `maxReplicas=1` on
+both components; live evidence additionally requires the warm `minReplicas=1`
+profile. The gateway receives the runtime's internal FQDN through
+`PLUGIN_RUNTIME_URL`. Keep origin validation enabled.
 
 Authentication is optional. The `mcpBearerToken` Bicep parameter is secure, becomes an ACA secret, and reaches the container only through an `MCP_BEARER_TOKEN` secret reference. Do not use `azd env set` for this value or print it. Store the value in Key Vault, then configure its reference interactively:
 
@@ -60,8 +67,10 @@ After deployment, `azd env get-values` exposes nonsecret evidence handoff
 values:
 
 - `ACA_RESOURCE_GROUP`
-- `ACA_APP_NAME`
+- `ACA_GATEWAY_APP_NAME`
+- `ACA_RUNTIME_APP_NAME`
 - `MCP_ENDPOINT_URL`
+- `PLUGIN_RUNTIME_INTERNAL_FQDN`
 - `EXPERIMENT_ORIGIN`
 - `EXPERIMENT_SCALING_PROFILE`
 - `EXPERIMENT_STORAGE_MODE`
@@ -76,13 +85,15 @@ sequenceDiagram
   participant azd
   participant ARM
   participant ACR
-  participant ACA
+  participant Gateway as Public gateway ACA
+  participant Runtime as Internal runtime ACA
   Learner->>azd: provision
   azd->>ARM: deploy Bicep
   Learner->>azd: deploy
   azd->>ACR: build and push image
-  azd->>ACA: create image revision
-  ACA-->>Learner: HTTPS endpoint
+  azd->>Gateway: create gateway image revision
+  azd->>Runtime: create runtime image revision with plugin artifact
+  Gateway-->>Learner: HTTPS MCP endpoint
 ```
 
 ![Deployment sequence showing Azure Developer CLI provisioning resources, pushing an image, and creating an Azure Container Apps revision.](media/deployment-sequence.svg)
@@ -106,8 +117,8 @@ decision to trust or reject the returned evidence.
 
 Before accepting live evidence, explain:
 
-1. Why the same container image and shared tool factory preserve the
-   experiment invariant.
+1. How the identical `capability.js` SHA-256 in the local client and private
+   runtime proves artifact reuse without source imports.
 1. Why `minReplicas=1`, `maxReplicas=1`, and memory storage are required for
    the warm baseline.
 1. Which new costs and failure modes are absent from the local run.

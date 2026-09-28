@@ -5,7 +5,8 @@ import {
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { resolve } from "node:path";
 import { URL } from "node:url";
-import { createHttpApp } from "../dist/packages/mcp-server/src/http.js";
+import { createGatewayApp } from "../dist/packages/company-mcp-gateway/src/http.js";
+import { createRuntimeApp } from "../dist/packages/server-plugin-runtime/src/http.js";
 import {
   persistDiscoveryEvidence,
   prepareDiscoveryEvidence,
@@ -39,11 +40,22 @@ function canonicalTools(result) {
 
 const discoveryDirectory = resolve(root, "artifacts/discovery");
 await prepareDiscoveryEvidence(discoveryDirectory);
-const app = createHttpApp();
-await new Promise((resolveListen) => app.listen(0, "127.0.0.1", resolveListen));
-const address = app.address();
-if (!address || typeof address === "string")
-  throw new Error("HTTP discovery adapter did not start.");
+const runtime = await createRuntimeApp();
+await new Promise((resolveListen) =>
+  runtime.listen(0, "127.0.0.1", resolveListen),
+);
+const runtimeAddress = runtime.address();
+if (!runtimeAddress || typeof runtimeAddress === "string")
+  throw new Error("Plugin runtime did not start.");
+const gateway = createGatewayApp(
+  `http://127.0.0.1:${runtimeAddress.port}/internal/mcp`,
+);
+await new Promise((resolveListen) =>
+  gateway.listen(0, "127.0.0.1", resolveListen),
+);
+const gatewayAddress = gateway.address();
+if (!gatewayAddress || typeof gatewayAddress === "string")
+  throw new Error("Company MCP gateway did not start.");
 
 const localClient = new Client({ name: "discovery-local", version: "1.0.0" });
 const remoteTestClient = new Client({
@@ -61,7 +73,7 @@ try {
   );
   await remoteTestClient.connect(
     new StreamableHTTPClientTransport(
-      new URL(`http://127.0.0.1:${address.port}/mcp`),
+      new URL(`http://127.0.0.1:${gatewayAddress.port}/mcp`),
       { requestInit: { headers: { origin: "http://127.0.0.1:3000" } } },
     ),
   );
@@ -80,7 +92,12 @@ try {
   );
 } finally {
   await Promise.allSettled([localClient.close(), remoteTestClient.close()]);
-  await new Promise((resolveClose, reject) =>
-    app.close((error) => (error ? reject(error) : resolveClose())),
-  );
+  await Promise.all([
+    new Promise((resolveClose, reject) =>
+      gateway.close((error) => (error ? reject(error) : resolveClose())),
+    ),
+    new Promise((resolveClose, reject) =>
+      runtime.close((error) => (error ? reject(error) : resolveClose())),
+    ),
+  ]);
 }

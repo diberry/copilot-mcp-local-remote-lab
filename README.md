@@ -9,10 +9,11 @@ The remote design does not turn the plugin into an MCP server. A company MCP
 gateway authenticates, authorizes, applies policy, and routes requests to a
 server-hosted plugin runtime behind it.
 
-The lab builds its evidence in stages. It first establishes transport,
-discovery, domain, latency, and failure controls. It then uses one capability
-inventory to compare the complete client plugin with a server-hosted plugin
-runtime behind a representative company MCP gateway.
+The build creates one executable plugin artifact. The local client loads that
+artifact over stdio. The private company runtime loads the exact same
+`capability.js` bytes and exposes them only through the public company gateway.
+The remote client receives a connection-only package with the expected server
+artifact hash; it does not receive another copy of the implementation.
 
 ## What you will learn
 
@@ -39,8 +40,8 @@ skill, hook, local-context, or approval behavior.
 ## What runs where?
 
 The client topology installs and runs the complete plugin on the learner
-device. The target remote topology keeps only the minimum connection surface
-in the client; the company MCP gateway fronts a server-hosted plugin runtime.
+device. The remote topology keeps only the minimum connection surface in the
+client; the company MCP gateway fronts a server-hosted plugin runtime.
 A thin client companion is allowed only when fidelity evidence proves that a
 client-native behavior cannot cross MCP. This repository does not implement a
 Microsoft 365 Copilot plugin.
@@ -70,7 +71,9 @@ npm run video:capture
 npm run video:verify
 ```
 
-These commands validate the lab's transport foundation. No Azure subscription
+These commands verify artifact identity, reject server imports of plugin
+source, run the same artifact through the local loader and company
+gateway/runtime path, and validate capability fidelity. No Azure subscription
 or native Copilot client is required for the fixture/loopback checks, and none
 of these commands deploys Azure resources. See
 [troubleshooting](docs/troubleshooting.md),

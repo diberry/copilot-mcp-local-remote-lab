@@ -1,0 +1,30 @@
+FROM node:22.14.0-bookworm-slim@sha256:1c18d9ab3af4585870b92e4dbc5cac5a0dc77dd13df1a5905cea89fc720eb05b AS build
+WORKDIR /app
+COPY package.json package-lock.json .npmrc ./
+COPY packages ./packages
+RUN npm ci
+COPY tsconfig.json plugin.json ./
+COPY scripts ./scripts
+COPY skills ./skills
+COPY com.github.copilot ./com.github.copilot
+COPY config ./config
+RUN npm run build && node scripts/build-plugin.mjs
+
+FROM node:22.14.0-bookworm-slim@sha256:1c18d9ab3af4585870b92e4dbc5cac5a0dc77dd13df1a5905cea89fc720eb05b
+ENV NODE_ENV=production PORT=3001 HOST=0.0.0.0 PLUGIN_ARTIFACT_ROOT=/app/artifacts/plugin/runtime
+WORKDIR /app
+COPY package.json package-lock.json .npmrc ./
+COPY packages/client-plugin-adapter/package.json packages/client-plugin-adapter/package.json
+COPY packages/company-mcp-gateway/package.json packages/company-mcp-gateway/package.json
+COPY packages/experiment-runner/package.json packages/experiment-runner/package.json
+COPY packages/mcp-server/package.json packages/mcp-server/package.json
+COPY packages/plugin-capability/package.json packages/plugin-capability/package.json
+COPY packages/server-plugin-runtime/package.json packages/server-plugin-runtime/package.json
+COPY packages/todo-core/package.json packages/todo-core/package.json
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build /app/dist/packages/server-plugin-runtime ./dist/packages/server-plugin-runtime
+COPY --from=build /app/artifacts/plugin/runtime ./artifacts/plugin/runtime
+USER node
+EXPOSE 3001
+HEALTHCHECK --interval=30s --timeout=3s CMD node -e "fetch('http://127.0.0.1:3001/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+CMD ["node", "dist/packages/server-plugin-runtime/src/http.js"]

@@ -7,4 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - run: docker build --pull -t copilot-mcp-local-remote-lab:test .
+      - run: docker build --pull --file Dockerfile.gateway --tag copilot-mcp-lab-gateway:test .
+      - run: docker build --pull --file Dockerfile.runtime --tag copilot-mcp-lab-runtime:test .

@@ -5,26 +5,71 @@ import { inventory, root, sha256 } from "./lib.mjs";
 
 const local = resolve(root, "plugins/local");
 const remote = resolve(root, "plugins/remote");
+const canonicalArtifact = resolve(root, "artifacts/plugin/canonical");
+const runtimeArtifact = resolve(root, "artifacts/plugin/runtime");
+await rm(resolve(root, "artifacts/plugin"), { recursive: true, force: true });
+await mkdir(resolve(canonicalArtifact, "dist/plugin"), { recursive: true });
 await build({
-  entryPoints: [resolve(root, "packages/mcp-server/src/stdio.ts")],
-  outfile: resolve(root, "dist/plugin/stdio.js"),
+  entryPoints: [resolve(root, "packages/plugin-capability/src/index.ts")],
+  outfile: resolve(canonicalArtifact, "dist/plugin/capability.js"),
   bundle: true,
   format: "esm",
   platform: "node",
   target: "node22",
 });
-const canonical = [
-  "plugin.json",
-  "skills",
-  "com.github.copilot",
-  "dist/plugin",
-];
+await build({
+  entryPoints: [resolve(root, "packages/client-plugin-adapter/src/stdio.ts")],
+  outfile: resolve(canonicalArtifact, "dist/plugin/stdio.js"),
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+});
+const canonical = ["plugin.json", "capability", "skills", "com.github.copilot"];
+for (const item of canonical)
+  await cp(resolve(root, item), resolve(canonicalArtifact, item), {
+    recursive: true,
+  });
+const capabilityBytes = await readFile(
+  resolve(canonicalArtifact, "dist/plugin/capability.js"),
+);
+const artifactPayloadInventory = await inventory(canonicalArtifact);
+await writeFile(
+  resolve(canonicalArtifact, "artifact.json"),
+  `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      pluginId: "copilot-mcp-local-remote-lab",
+      pluginVersion: "1.0.0",
+      entry: "dist/plugin/capability.js",
+      entrySha256: sha256(capabilityBytes),
+      payloadSha256: sha256(JSON.stringify(artifactPayloadInventory)),
+    },
+    null,
+    2,
+  )}\n`,
+);
+await cp(canonicalArtifact, runtimeArtifact, { recursive: true });
 for (const output of [local, remote]) {
   await rm(output, { recursive: true, force: true });
-  await mkdir(output, { recursive: true });
-  for (const item of canonical)
-    await cp(resolve(root, item), resolve(output, item), { recursive: true });
 }
+await cp(canonicalArtifact, local, { recursive: true });
+await mkdir(remote, { recursive: true });
+const plugin = JSON.parse(
+  await readFile(resolve(canonicalArtifact, "plugin.json"), "utf8"),
+);
+delete plugin.skills;
+delete plugin.hooks;
+plugin.description =
+  "Connect Copilot to the complete plugin artifact hosted behind company MCP.";
+await writeFile(
+  resolve(remote, "plugin.json"),
+  `${JSON.stringify(plugin, null, 2)}\n`,
+);
+await cp(
+  resolve(canonicalArtifact, "artifact.json"),
+  resolve(remote, "server-artifact.json"),
+);
 await cp(
   resolve(root, "config/mcp/local.mcp.json"),
   resolve(local, "mcp.json"),
@@ -64,6 +109,7 @@ await writeFile(
       canonicalPayloadSha256: hashInventory(payloadInventory),
       localBundleSha256: hashInventory(inventories.local),
       remoteBundleSha256: hashInventory(inventories.remote),
+      serverArtifactSha256: sha256(JSON.stringify(artifactPayloadInventory)),
       localBindingSha256: inventories.local.find(
         (item) => item.path === "mcp.json",
       ).sha256,

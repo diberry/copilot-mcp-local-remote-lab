@@ -49,7 +49,9 @@ The synthetic user task, intended capability, domain rules, and expected
 business outcome remain fixed. The client package and server runtime are
 allowed to differ because their hosts expose different primitives. The
 capability inventory makes those differences auditable instead of hiding them
-behind byte-identical client bundles.
+behind byte-identical client bundles. This lab instead proves that the local
+client and private runtime load one executable artifact hash while the remote
+client carries connection metadata only.
 
 The experiment has three questions:
 

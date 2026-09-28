@@ -1,31 +1,37 @@
 # Source code tour
 
-The source follows the stages in the
-[implementation plan](../docs/implementation-plan.md). The stdio/HTTP packages
-establish reusable transport evidence. The capability, gateway, and runtime
-packages extend that foundation into the plugin-placement comparison.
+The source follows the
+[implementation plan](../docs/implementation-plan.md). The placement
+comparison uses one built plugin artifact rather than copying plugin source
+into the company MCP layer.
 
 The transport source is organized to make its variable visible. Its parity
 evidence supports, but does not replace, complete-plugin fidelity evidence.
 
-## Invariant: shared domain and tool registration
+## Invariant: one executable plugin artifact
 
-Start in `todo-core/src/index.ts`. It owns todo validation, storage, stable IDs,
-and normalized errors without importing MCP, HTTP, or process APIs.
+Start in `plugin-capability/src/index.ts`. It owns the executable plugin
+behavior. `scripts/build-plugin.mjs` bundles it once into
+`artifacts/plugin/canonical/dist/plugin/capability.js`, writes its SHA-256 to
+`artifact.json`, and copies the unchanged artifact to the local client and
+private server runtime.
 
-Next, inspect `mcp-server/src/create-server.ts`. `registerTodoTools()` is the
-single registration factory used by both adapters. This is the most important
-design choice in the lab: local and remote cannot silently acquire different
-tool implementations.
+Next, inspect `client-plugin-adapter/src/stdio.ts` and
+`server-plugin-runtime/src/artifact-loader.ts`. Both dynamically load the built
+artifact. Neither placement compiles a separate capability implementation.
+The remote client package contains connection metadata and
+`server-artifact.json`, but no executable plugin code.
 
 ## Variable: MCP boundary
 
-Compare the two thin adapters:
+Compare the two paths:
 
-- `mcp-server/src/stdio.ts` starts the server as a client-owned child process.
-- `mcp-server/src/http.ts` exposes the same server through Streamable HTTP and
-  adds the controls required by a network boundary: Origin, optional bearer
-  auth, request size, content type, health, and readiness.
+- `client-plugin-adapter/src/stdio.ts` loads the artifact as a client-owned
+  child process.
+- `server-plugin-runtime/src/http.ts` loads the same artifact behind internal
+  ingress.
+- `company-mcp-gateway/src/http.ts` enforces Origin, optional bearer auth,
+  request size, content type, health, and readiness, then proxies MCP bytes.
 
 When studying a result, attribute todo behavior to the shared core and
 boundary-specific behavior to one of these adapters.
@@ -47,8 +53,8 @@ The lab uses these package boundaries across its implementation stages:
 - `server-plugin-runtime` behind the gateway; and
 - a thin client companion only when fidelity tests prove it is required.
 
-The current `mcp-server` and `todo-core` packages can supply tool/domain
-building blocks, but they cannot remain the complete remote architecture.
+The earlier `mcp-server` and `todo-core` packages remain as transport
+foundation evidence. The placement path does not deploy that HTTP server.
 
 ## Measurement: paired runner
 

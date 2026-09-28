@@ -5,10 +5,17 @@ infra:
   provider: bicep
   path: infra
 services:
-  mcp:
+  gateway:
     project: .
     host: containerapp
     language: js
     docker:
-      path: Dockerfile
+      path: Dockerfile.gateway
+      context: .
+  runtime:
+    project: .
+    host: containerapp
+    language: js
+    docker:
+      path: Dockerfile.runtime
       context: .

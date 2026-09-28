@@ -9,8 +9,8 @@ const remote = resolve(work, "remote");
 
 afterEach(() => rm(work, { recursive: true, force: true }));
 
-async function createTree(directory: string, mcp: string, payload: string) {
-  await mkdir(directory, { recursive: true });
+async function createLocalTree(directory: string, hash: string) {
+  await mkdir(resolve(directory, "dist/plugin"), { recursive: true });
   await Promise.all([
     writeFile(
       resolve(directory, "plugin.json"),
@@ -19,29 +19,64 @@ async function createTree(directory: string, mcp: string, payload: string) {
         version: "1.0.0",
       }),
     ),
-    writeFile(resolve(directory, "mcp.json"), mcp),
-    writeFile(resolve(directory, "payload.txt"), payload),
+    writeFile(resolve(directory, "mcp.json"), "local"),
+    writeFile(
+      resolve(directory, "artifact.json"),
+      JSON.stringify({ entrySha256: "entry-hash", payloadSha256: hash }),
+    ),
+    writeFile(resolve(directory, "dist/plugin/capability.js"), "capability"),
+    writeFile(resolve(directory, "dist/plugin/stdio.js"), "loader"),
+  ]);
+}
+
+async function createRemoteTree(
+  directory: string,
+  hash: string,
+  executable = false,
+) {
+  await mkdir(resolve(directory, "dist/plugin"), { recursive: true });
+  await Promise.all([
+    writeFile(
+      resolve(directory, "plugin.json"),
+      JSON.stringify({
+        name: "copilot-mcp-local-remote-lab",
+        version: "1.0.0",
+      }),
+    ),
+    writeFile(resolve(directory, "mcp.json"), "remote"),
+    writeFile(
+      resolve(directory, "server-artifact.json"),
+      JSON.stringify({ entrySha256: "entry-hash", payloadSha256: hash }),
+    ),
+    ...(executable
+      ? [
+          writeFile(
+            resolve(directory, "dist/plugin/capability.js"),
+            "copied source",
+          ),
+        ]
+      : []),
   ]);
 }
 
 describe("generated plugin comparison", () => {
-  it("recomputes current bytes instead of trusting an external inventory", async () => {
+  it("rejects executable plugin code in the remote connection", async () => {
     await Promise.all([
-      createTree(local, "local binding", "current local bytes"),
-      createTree(remote, "remote binding", "different remote bytes"),
+      createLocalTree(local, "same-hash"),
+      createRemoteTree(remote, "same-hash", true),
     ]);
     await expect(comparePluginTrees(local, remote)).rejects.toThrow(
-      "Unexpected bundle differences",
+      "contains executable plugin",
     );
   });
 
-  it("allows only mcp.json bytes to differ", async () => {
+  it("binds the remote connection to the local artifact hash", async () => {
     await Promise.all([
-      createTree(local, "local binding", "same payload"),
-      createTree(remote, "remote binding", "same payload"),
+      createLocalTree(local, "same-hash"),
+      createRemoteTree(remote, "same-hash"),
     ]);
     await expect(comparePluginTrees(local, remote)).resolves.toMatchObject({
-      differences: ["mcp.json"],
+      artifactSha256: "same-hash",
     });
   });
 });

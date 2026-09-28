@@ -2,7 +2,7 @@
   "transport": "stdio",
   "evidenceTier": "remote-test",
   "remoteEndpoint": "loopback",
-  "discoverySha256": "1665e7a11cd18ba0f977145922a6812b79548958bc50294c487eeb10a158c550",
+  "discoverySha256": "7601d3e67c2b53a3aff74717884983a56b25bd1066fad1b8800500b92526a108",
   "pluginVersion": "1.0.0",
   "toolCount": 5,
   "durationsMs": [2, 3, 2, 4, 3, 2, 3, 2, 4, 3, 2, 3, 2, 4, 3, 2, 3, 2, 4, 3],

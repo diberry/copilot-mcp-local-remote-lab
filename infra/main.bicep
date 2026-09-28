@@ -5,7 +5,8 @@ param environmentName string
 param location string = deployment().location
 @allowed(['warm', 'cold'])
 param scalingProfile string = 'warm'
-param imageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param gatewayImageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param runtimeImageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 @minLength(1)
 param allowedOrigin string = 'https://copilot.local'
 @secure()
@@ -30,39 +31,61 @@ module registry 'modules/container-registry.bicep' = {
   name: 'registry'
   params: { name: 'acr${token}', location: location, tags: tags }
 }
-module identity 'modules/identity.bicep' = {
+module gatewayIdentity 'modules/identity.bicep' = {
   scope: resourceGroup
-  name: 'identity'
-  params: { name: 'id-${environmentName}', location: location, tags: tags, registryId: registry.outputs.id }
+  name: 'gateway-identity'
+  params: { name: 'id-${environmentName}-gateway', location: location, tags: tags, registryId: registry.outputs.id }
+}
+module runtimeIdentity 'modules/identity.bicep' = {
+  scope: resourceGroup
+  name: 'runtime-identity'
+  params: { name: 'id-${environmentName}-runtime', location: location, tags: tags, registryId: registry.outputs.id }
 }
 module managedEnvironment 'modules/managed-environment.bicep' = {
   scope: resourceGroup
   name: 'environment'
   params: { name: 'cae-${environmentName}', location: location, tags: tags, workspaceId: logs.outputs.customerId, workspaceKey: logs.outputs.sharedKey }
 }
-module app 'modules/container-app.bicep' = {
+module runtime 'modules/plugin-runtime-app.bicep' = {
   scope: resourceGroup
-  name: 'app'
+  name: 'plugin-runtime'
   params: {
-    name: 'ca-${environmentName}'
+    name: 'ca-${environmentName}-runtime'
     location: location
-    tags: union(tags, { 'azd-service-name': 'mcp' })
+    tags: union(tags, { 'azd-service-name': 'runtime' })
     environmentId: managedEnvironment.outputs.id
-    identityId: identity.outputs.id
+    identityId: runtimeIdentity.outputs.id
     registryServer: registry.outputs.loginServer
-    imageName: imageName
+    imageName: runtimeImageName
+    minReplicas: scalingProfile == 'warm' ? 1 : 0
+  }
+}
+module gateway 'modules/container-app.bicep' = {
+  scope: resourceGroup
+  name: 'company-mcp-gateway'
+  params: {
+    name: 'ca-${environmentName}-gateway'
+    location: location
+    tags: union(tags, { 'azd-service-name': 'gateway' })
+    environmentId: managedEnvironment.outputs.id
+    identityId: gatewayIdentity.outputs.id
+    registryServer: registry.outputs.loginServer
+    imageName: gatewayImageName
     minReplicas: scalingProfile == 'warm' ? 1 : 0
     allowedOrigin: allowedOrigin
     mcpBearerToken: mcpBearerToken
+    pluginRuntimeUrl: 'https://${runtime.outputs.fqdn}/internal/mcp'
   }
 }
 
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
-output SERVICE_MCP_URI string = 'https://${app.outputs.fqdn}'
+output SERVICE_GATEWAY_URI string = 'https://${gateway.outputs.fqdn}'
 output ACA_RESOURCE_GROUP string = resourceGroup.name
-output ACA_APP_NAME string = 'ca-${environmentName}'
-output MCP_ENDPOINT_URL string = 'https://${app.outputs.fqdn}/mcp'
+output ACA_GATEWAY_APP_NAME string = 'ca-${environmentName}-gateway'
+output ACA_RUNTIME_APP_NAME string = 'ca-${environmentName}-runtime'
+output MCP_ENDPOINT_URL string = 'https://${gateway.outputs.fqdn}/mcp'
+output PLUGIN_RUNTIME_INTERNAL_FQDN string = runtime.outputs.fqdn
 output EXPERIMENT_ORIGIN string = allowedOrigin
 output EXPERIMENT_SCALING_PROFILE string = scalingProfile
 output EXPERIMENT_STORAGE_MODE string = 'memory'
