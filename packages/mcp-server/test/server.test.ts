@@ -10,7 +10,7 @@ afterEach(() => {
 describe.each(["stdio", "streamable-http"] as const)(
   "shared %s contract",
   (transport) => {
-    it("returns equivalent wrapped results for all five tools", async () => {
+    it("returns equivalent wrapped results for all tools", async () => {
       const invoke = createToolExecutor(transport);
       for (const [name, input] of [
         ["reset_todos", {}],
@@ -26,6 +26,31 @@ describe.each(["stdio", "streamable-http"] as const)(
           serverVersion: "1.0.0",
         });
       }
+    });
+
+    it("exposes synthetic context and responsibility evidence for the active boundary", async () => {
+      const result = await createToolExecutor(transport)("diagnostics", {
+        includeContextStudy: true,
+      });
+      expect(result).toMatchObject({
+        outcome: "success",
+        data: {
+          transport,
+          contextStudy: {
+            modelLocation: "copilot-client",
+            pluginLocation: "copilot-client",
+            toolExecution:
+              transport === "stdio" ? "learner-device" : "shared-service",
+            syntheticDecisionEvidence: {
+              source:
+                transport === "stdio"
+                  ? "learner-approved-local-fixture"
+                  : "operator-curated-team-fixture",
+              recommendation: transport === "stdio" ? "todo-1" : "todo-3",
+            },
+          },
+        },
+      });
     });
   },
 );

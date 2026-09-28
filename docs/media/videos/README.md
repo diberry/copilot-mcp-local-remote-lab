@@ -6,8 +6,9 @@ The lab includes four paced, verified WebM previews. Each video runs for at
 least 20 seconds and presents six steps: context, action, evidence, and a clear
 takeaway.
 
-1. [Execution boundary](./01-execution-boundary.webm) — contrasts the local
-   stdio process boundary with the loopback Streamable HTTP boundary.
+1. [Context and responsibility boundary](./01-execution-boundary.webm) — shows
+   that the model and plugin stay client-side while evidence, execution, and
+   learner/operator responsibilities change across the MCP boundary.
 1. [Equivalent tool flow](./02-equivalent-tool-flow.webm) — shows the same
    plugin identity and five-tool discovery surface through both transports.
 1. [Latency comparison](./03-latency-cold-warm.webm) — visualizes the paired,

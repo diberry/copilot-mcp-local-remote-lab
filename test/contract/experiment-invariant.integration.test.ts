@@ -33,6 +33,26 @@ function finalTodos(
   }));
 }
 
+function contextStudy(result: Awaited<ReturnType<Client["callTool"]>>) {
+  return (
+    result.structuredContent as {
+      data: {
+        contextStudy: {
+          modelLocation: string;
+          pluginLocation: string;
+          toolExecution: string;
+          syntheticDecisionEvidence: {
+            source: string;
+            recommendation: string;
+          };
+          userResponsibilities: string[];
+          operatorResponsibilities: string[];
+        };
+      };
+    }
+  ).data.contextStudy;
+}
+
 describe("learning contract: same behavior, different MCP boundary", () => {
   it("reaches the same domain outcome through real stdio and HTTP clients", async () => {
     await new Promise<void>((resolve) => app.listen(0, "127.0.0.1", resolve));
@@ -65,5 +85,43 @@ describe("learning contract: same behavior, different MCP boundary", () => {
       { id: "todo-2", title: "synthetic-beta", completed: true },
       { id: "todo-3", title: "synthetic-gamma", completed: false },
     ]);
+
+    const localStudy = contextStudy(
+      await local.callTool({
+        name: "diagnostics",
+        arguments: { includeContextStudy: true },
+      }),
+    );
+    const remoteStudy = contextStudy(
+      await remote.callTool({
+        name: "diagnostics",
+        arguments: { includeContextStudy: true },
+      }),
+    );
+
+    expect(localStudy).toMatchObject({
+      modelLocation: "copilot-client",
+      pluginLocation: "copilot-client",
+      toolExecution: "learner-device",
+      syntheticDecisionEvidence: {
+        source: "learner-approved-local-fixture",
+        recommendation: "todo-1",
+      },
+    });
+    expect(remoteStudy).toMatchObject({
+      modelLocation: "copilot-client",
+      pluginLocation: "copilot-client",
+      toolExecution: "shared-service",
+      syntheticDecisionEvidence: {
+        source: "operator-curated-team-fixture",
+        recommendation: "todo-3",
+      },
+    });
+    expect(localStudy.userResponsibilities).not.toEqual(
+      remoteStudy.userResponsibilities,
+    );
+    expect(localStudy.operatorResponsibilities).not.toEqual(
+      remoteStudy.operatorResponsibilities,
+    );
   });
 });

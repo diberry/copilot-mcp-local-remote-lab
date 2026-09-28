@@ -4,18 +4,23 @@
 
 ## Experiment question
 
-What changes when the **same GitHub Copilot Agent Plugin and MCP tools** run
-through a local stdio boundary versus a Streamable HTTP boundary?
+What changes in the AI's available evidence and in the user's responsibilities
+when the **same GitHub Copilot Agent Plugin and MCP tools** execute through a
+local stdio boundary versus a shared Streamable HTTP service?
 
-The experiment is useful only if the boundary is isolated. It does not compare
-different plugins, different tool implementations, or different todo data.
+Transport parity first isolates the boundary. A second context-placement cell
+then intentionally supplies different synthetic decision evidence from the
+learner device and the shared service. It still does not compare different
+plugins, tool contracts, or tool implementations.
 
 ## Hypothesis
 
 Both bindings should expose the same client-visible tools and produce the same
 domain outcome. The HTTP boundary should add measurable transport and
 operational overhead, but it also enables centralized deployment,
-observability, and server-side integrations.
+observability, server-side integrations, and operator-governed shared context.
+The model itself should remain client-side and unchanged. Its recommendation
+should change only when the evidence available through the tool changes.
 
 ## Controlled-variable contract
 
@@ -31,18 +36,34 @@ observability, and server-side integrations.
 If another row changes, the result belongs in a separate experiment cell and
 must not be merged into the baseline.
 
+## Context-placement cell
+
+The separate context-placement cell calls the same `diagnostics` tool with
+`includeContextStudy: true`. The local response contains a synthetic,
+learner-approved focus signal. The remote response contains a synthetic,
+operator-curated team policy. The model can therefore reach a different
+recommendation without changing the plugin, agent, skill, model, or tool
+implementation.
+
+This is the learning distinction:
+
+- **AI capability** comes from the model plus the tool contract.
+- **Useful intelligence** depends on the evidence the tool can retrieve and
+  the provenance the user can evaluate.
+- **Responsibility** follows the evidence and execution boundary.
+
 ## Evidence chain
 
-| Surface    | What to inspect                                                     | What it teaches or proves                                                 |
-| ---------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Source     | `packages/README.md` and `packages/mcp-server/src/create-server.ts` | Both adapters use one tool-registration factory and todo service          |
-| Bindings   | `plugins/local/mcp.json` and `plugins/remote/mcp.json`              | Only the MCP connection changes in generated packages                     |
-| Tests      | `test/contract/experiment-invariant.integration.test.ts`            | Real stdio and HTTP clients reach the same domain outcome                 |
-| Tests      | `test/architecture/plugin-comparison.test.ts`                       | Generated package bytes may differ only in `mcp.json`                     |
-| Runner     | `packages/experiment-runner/src/cli.ts`                             | Alternating paired execution and evidence-tier labeling                   |
-| Videos     | `docs/media/videos/`                                                | A visual explanation of boundary, parity, latency, and recovery           |
-| Deployment | `infra/main.bicep`                                                  | The remote boundary adds ACA, identity, registry, logs, ingress, and cost |
-| Manifest   | `artifacts/experiments/<cell>.json`                                 | Auditable controls, environment, ordering, and measurements               |
+| Surface    | What to inspect                                                     | What it teaches or proves                                                                                                          |
+| ---------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Source     | `packages/README.md` and `packages/mcp-server/src/create-server.ts` | Both adapters use one tool-registration factory; the context cell exposes boundary-specific evidence and responsibility provenance |
+| Bindings   | `plugins/local/mcp.json` and `plugins/remote/mcp.json`              | Only the MCP connection changes in generated packages                                                                              |
+| Tests      | `test/contract/experiment-invariant.integration.test.ts`            | Real stdio and HTTP clients reach the same domain outcome                                                                          |
+| Tests      | `test/architecture/plugin-comparison.test.ts`                       | Generated package bytes may differ only in `mcp.json`                                                                              |
+| Runner     | `packages/experiment-runner/src/cli.ts`                             | Alternating paired execution and evidence-tier labeling                                                                            |
+| Videos     | `docs/media/videos/`                                                | A visual explanation of boundary, parity, latency, and recovery                                                                    |
+| Deployment | `infra/main.bicep`                                                  | The remote boundary adds ACA, identity, registry, logs, ingress, and cost                                                          |
+| Manifest   | `artifacts/experiments/<cell>.json`                                 | Auditable controls, environment, ordering, and measurements                                                                        |
 
 ## Success criteria
 
@@ -53,6 +74,10 @@ After the lab, verify that you can answer:
 1. Why is loopback HTTP useful but not Azure deployment evidence?
 1. Which result demonstrates behavioral parity?
 1. Which new failure, security, scaling, and cost concerns appear remotely?
+1. Why can the same client-side model make a different recommendation in the
+   context-placement cell?
+1. Which responsibilities stay with the user, and which transfer to a service
+   operator?
 1. Which evidence would you need before making a production decision?
 
 ## Limits of the evidence
@@ -67,3 +92,6 @@ After the lab, verify that you can answer:
   statistical superiority.
 - In-memory, single-replica behavior intentionally excludes persistence and
   horizontal scaling from the baseline.
+- The context-placement evidence is synthetic. It demonstrates provenance and
+  responsibility shifts, not the quality of a real organizational knowledge
+  base.

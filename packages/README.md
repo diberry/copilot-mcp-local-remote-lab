@@ -2,6 +2,11 @@
 
 The source is organized to make the experiment variable visible.
 
+The transport baseline proves parity. The context-placement cell then uses the
+same tool implementation to show a second effect of the boundary: which
+governed evidence is available to client-side model reasoning and who is
+responsible for that evidence.
+
 ## Invariant: shared domain and tool registration
 
 Start in `todo-core/src/index.ts`. It owns todo validation, storage, stable IDs,
@@ -24,6 +29,12 @@ Compare the two thin adapters:
 When studying a result, attribute todo behavior to the shared core and
 boundary-specific behavior to one of these adapters.
 
+`create-server.ts` also owns `describeBoundaryStudy()`. It returns synthetic
+provenance, recommendation evidence, and a learner/operator responsibility
+split for the active boundary. Both adapters register the same `diagnostics`
+schema. The intentionally different context-study response is therefore a
+controlled evidence-placement result, not a different plugin or tool.
+
 ## Measurement: paired runner
 
 Read the experiment runner in this order:
@@ -41,7 +52,9 @@ cell requires its own execution path, controls, tests, and interpretation.
 ## Trace the learning claim into tests
 
 - `test/contract/experiment-invariant.integration.test.ts` proves both real
-  transports reach the same final todo state.
+  transports reach the same final todo state, then proves that the optional
+  context study exposes different provenance, recommendations, and
+  responsibilities through those same clients.
 - `test/contract/adapter-discovery.integration.test.ts` proves client-visible
   discovery parity.
 - `test/architecture/plugin-comparison.test.ts` proves only `mcp.json` may

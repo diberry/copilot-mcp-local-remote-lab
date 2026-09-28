@@ -17,8 +17,9 @@ npm run video:verify
 
 Open `artifacts/videos/index.html`. Each 20–30 second clip uses six paced
 steps to establish the question, demonstrate both boundaries, show the
-validated evidence, and state the takeaway. The four clips explain the
-execution boundary, equivalent tool flow, paired latency baseline, and
+validated evidence, and state the takeaway. The first clip explains how
+context and responsibility move while the plugin and model stay client-side.
+The other clips explain equivalent tool flow, paired latency baseline, and
 failure/recovery. Playwright reads the recorded WebM metadata and rejects any
 clip shorter than 20 seconds. Each clip also has a detailed text transcript.
 Inputs containing forbidden prompt, todo content, token, header, environment,

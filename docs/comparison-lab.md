@@ -4,12 +4,15 @@
 
 ## Question and hypothesis
 
-**Question:** What changes when one plugin and tool implementation cross a
-local process boundary versus an HTTP boundary?
+**Question:** What changes in transport, available decision evidence, and
+responsibility when one plugin and tool implementation cross a local process
+boundary versus an HTTP boundary?
 
 **Hypothesis:** Discovery and domain outcomes remain equivalent. HTTP adds
 transport latency and operational concerns, while enabling centralized hosting
-and shared observability.
+and shared observability. In a separate context-placement cell, centrally
+governed evidence can change the model's recommendation without changing the
+client-side model or plugin.
 
 Run parity checks before measurements:
 
@@ -54,9 +57,31 @@ Use this observation table:
 | Tail behavior        | Local and remote p95                | Variability worth investigating                      |
 | Operational tradeoff | Evidence tier and manifest controls | Which boundary and deployment were actually measured |
 
+## Compare context and responsibility separately
+
+Do not merge context-placement observations into the latency report. Call
+`diagnostics` with `includeContextStudy: true` through each binding and use the
+identical prompt from the [usage lab](usage-lab.md).
+
+Compare:
+
+| Observation               | Local                                                | Remote                                                         |
+| ------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| Model and plugin location | Copilot client                                       | Copilot client                                                 |
+| Tool execution            | Learner device                                       | Shared service                                                 |
+| Evidence provenance       | Learner-approved local fixture                       | Operator-curated team fixture                                  |
+| Expected recommendation   | `todo-1`                                             | `todo-3`                                                       |
+| User focus                | Runtime, access, device availability, local evidence | Authentication, disclosure choice, provenance verification     |
+| Operator focus            | Compatible package updates                           | Context governance, security, uptime, scaling, telemetry, cost |
+
+This cell intentionally changes evidence placement. It demonstrates how useful
+AI behavior can change when a tool reaches different context; it is not a
+transport performance result.
+
 ## Do not overclaim
 
 The report does not prove that local is always faster, that remote is
-production-ready, or that loopback predicts internet latency. It shows how to
-create repeatable evidence and how to identify the additional concerns that a
-remote MCP boundary introduces.
+production-ready, that loopback predicts internet latency, or that remote
+execution makes a model smarter. It shows how to create repeatable evidence,
+how governed context can change a recommendation, and how responsibilities
+move with the execution boundary.

@@ -2,6 +2,7 @@ import * as z from "zod/v4";
 import {
   AddTodoInputSchema,
   CompleteTodoInputSchema,
+  DiagnosticsInputSchema,
   EmptyInputSchema,
 } from "../../todo-core/src/index.js";
 
@@ -28,8 +29,9 @@ export const toolCatalog = [
   },
   {
     name: "diagnostics",
-    description: "Return safe server and active transport metadata.",
-    inputSchema: EmptyInputSchema,
+    description:
+      "Return safe boundary metadata and optional synthetic context-placement evidence.",
+    inputSchema: DiagnosticsInputSchema,
   },
 ] as const satisfies readonly {
   name: string;

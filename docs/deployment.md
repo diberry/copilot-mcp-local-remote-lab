@@ -17,6 +17,7 @@ adds the real operational boundary:
 | Log Analytics                      | Correlate content-free request telemetry across a shared service       |
 | Replica controls                   | Keep the warm baseline stable, then study cold start separately        |
 | Optional bearer secret             | Measure authentication in a distinct experiment cell                   |
+| Operator-governed context boundary | Study provenance, freshness, authorization, retention, and user trust  |
 
 `azd provision` deploys a Log Analytics workspace, managed Container Apps environment, ACR, user-assigned identity with AcrPull, and externally accessible Container App. Bicep owns configuration.
 
@@ -71,6 +72,19 @@ sequenceDiagram
 
 Verify `GET /healthz` and `GET /readyz`, inspect console/system logs by correlation ID only, and never log request content. Use the warm profile (`minReplicas=1`) for runnable baseline and authentication cells. Cold-profile measurements remain a manual follow-on until a distinct runner execution path is implemented. Then follow [cleanup](cleanup-and-cost.md).
 
+Deployment does not move the plugin or model into ACA. It transfers execution
+and operational responsibility for the MCP service. A production version of
+the synthetic team-context exercise would require the operator to own:
+
+- source authorization and tenant isolation;
+- evidence freshness and provenance;
+- service patching, availability, recovery, and scaling;
+- retention, deletion, telemetry minimization, and cost;
+- a way for users to inspect why a recommendation was made.
+
+The user still owns authentication, the decision to disclose context, and the
+decision to trust or reject the returned evidence.
+
 ## Deployment checkpoint
 
 Before accepting live evidence, explain:
@@ -80,4 +94,6 @@ Before accepting live evidence, explain:
 1. Why `minReplicas=1`, `maxReplicas=1`, and memory storage are required for
    the warm baseline.
 1. Which new costs and failure modes are absent from the local run.
+1. Which context-governance responsibilities transfer from the learner to the
+   service operator, and which remain with the learner.
 1. Why deleting the resource group is part of completing the lab.

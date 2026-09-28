@@ -2,8 +2,9 @@
 
 > This is a learning repository, not a production reference architecture.
 
-The purpose of this lab is to establish behavioral parity before comparing
-transport measurements.
+The purpose of this lab is to establish behavioral parity, then observe how
+the same client-side AI reasons differently when its MCP tool supplies context
+from a different governed boundary.
 
 ## 1. Predict the result
 
@@ -54,3 +55,34 @@ until parity passes.
 This scenario is intentionally small. Its value is not todo functionality; it
 is a controlled probe that crosses every layer—client binding, MCP transport,
 shared registration, validation, domain service, and normalized response.
+
+## 5. Run the context-placement study
+
+Install one binding at a time in a fresh client session. Ask the same agent:
+
+> Call diagnostics with the context study enabled. Based only on the returned
+> evidence, which synthetic todo should I work on next? Name the evidence
+> source, explain why it supports that choice, and list my responsibilities
+> separately from the service operator's.
+
+The local binding should cite `learner-approved-local-fixture` and recommend
+`todo-1`. The remote binding should cite `operator-curated-team-fixture` and
+recommend `todo-3`. Save both responses next to the binding and source commit
+that produced them.
+
+The expected difference is useful only because the tool contract and client
+instructions remain fixed. Do not say the remote model is smarter. The model
+has different evidence, and the remote evidence carries a different trust and
+responsibility model.
+
+## 6. Reflect on the handoff
+
+Answer these questions:
+
+1. Which local evidence should never leave the learner device?
+1. Which team evidence would be unsafe or expensive to copy to every device?
+1. Who is responsible for freshness, provenance, authorization, and deletion
+   of remote context?
+1. What must the user verify before acting on a remote recommendation?
+1. Does the remote value justify authentication, availability, telemetry,
+   scaling, and cost responsibilities?

@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import {
   AddTodoInputSchema,
   CompleteTodoInputSchema,
+  DiagnosticsInputSchema,
   InMemoryTodoStorage,
   normalizeError,
   TodoService,
@@ -11,6 +12,47 @@ import { emitTelemetry } from "./telemetry.js";
 
 export type TransportName = "stdio" | "streamable-http";
 export const SERVER_VERSION = "1.0.0";
+
+export function describeBoundaryStudy(transport: TransportName) {
+  const local = transport === "stdio";
+  return {
+    modelLocation: "copilot-client",
+    pluginLocation: "copilot-client",
+    toolExecution: local ? "learner-device" : "shared-service",
+    syntheticDecisionEvidence: local
+      ? {
+          source: "learner-approved-local-fixture",
+          recommendation: "todo-1",
+          reason: "The learner marked synthetic-alpha as the current focus.",
+        }
+      : {
+          source: "operator-curated-team-fixture",
+          recommendation: "todo-3",
+          reason:
+            "The shared team policy prioritizes synthetic-gamma after synthetic-beta is complete.",
+        },
+    userResponsibilities: local
+      ? [
+          "install and update the local runtime",
+          "grant access to local context",
+          "keep the device and process available",
+          "inspect local execution evidence",
+        ]
+      : [
+          "authenticate to the service",
+          "decide what context may cross the network boundary",
+          "verify the provenance of shared recommendations",
+        ],
+    operatorResponsibilities: local
+      ? ["publish compatible plugin and server updates"]
+      : [
+          "secure and patch the shared service",
+          "govern shared context and policy",
+          "operate availability and scaling",
+          "monitor telemetry and cost without collecting task content",
+        ],
+  };
+}
 
 export function createToolExecutor(
   transport: TransportName,
@@ -27,9 +69,17 @@ export function createToolExecutor(
       else if (operation === "list_todos") data = service.list();
       else if (operation === "complete_todo")
         data = service.complete(CompleteTodoInputSchema.parse(input).id);
-      else if (operation === "diagnostics")
-        data = { transport, healthy: true, pluginVersion: SERVER_VERSION };
-      else throw new Error("Unknown operation");
+      else if (operation === "diagnostics") {
+        const { includeContextStudy } = DiagnosticsInputSchema.parse(input);
+        data = {
+          transport,
+          healthy: true,
+          pluginVersion: SERVER_VERSION,
+          ...(includeContextStudy
+            ? { contextStudy: describeBoundaryStudy(transport) }
+            : {}),
+        };
+      } else throw new Error("Unknown operation");
       const result = {
         requestId,
         operation,
@@ -99,8 +149,10 @@ export function registerTodoTools(
   });
   register(
     "diagnostics",
-    "Return safe server and active transport metadata.",
-    {},
+    "Return safe boundary metadata and optional synthetic context-placement evidence.",
+    {
+      includeContextStudy: DiagnosticsInputSchema.shape.includeContextStudy,
+    },
   );
   return server;
 }
