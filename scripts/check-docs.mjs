@@ -4,7 +4,7 @@ import { filesUnder, root } from "./lib.mjs";
 const required = [
   "README.md",
   "docs/learning-objectives.md",
-  "docs/proposals/plugin-behind-company-mcp.md",
+  "docs/implementation-plan.md",
   "docs/concepts.md",
   "docs/architecture.md",
   "docs/local-setup.md",

@@ -1,13 +1,12 @@
-# Current transport-prototype source tour
+# Source code tour
 
-> This code implements the lower-level stdio/HTTP transport prototype. It does
-> not yet contain a separate company MCP gateway or a server-hosted plugin
-> runtime. See the
-> [implementation proposal](../docs/proposals/plugin-behind-company-mcp.md).
+The source follows the stages in the
+[implementation plan](../docs/implementation-plan.md). The stdio/HTTP packages
+establish reusable transport evidence. The capability, gateway, and runtime
+packages extend that foundation into the plugin-placement comparison.
 
-The source is organized to make the current transport variable visible. Its
-parity evidence remains useful, but it is not complete-plugin fidelity
-evidence.
+The transport source is organized to make its variable visible. Its parity
+evidence supports, but does not replace, complete-plugin fidelity evidence.
 
 ## Invariant: shared domain and tool registration
 
@@ -38,9 +37,9 @@ schema. The intentionally different context-study response is therefore a
 controlled evidence-placement result, not proof that the plugin runs behind a
 company MCP layer.
 
-## Planned package boundaries
+## Package boundaries
 
-The redesign will add:
+The lab uses these package boundaries across its implementation stages:
 
 - `plugin-capability` as the canonical behavior and fidelity inventory;
 - `client-plugin-adapter` for the complete client-installed package;

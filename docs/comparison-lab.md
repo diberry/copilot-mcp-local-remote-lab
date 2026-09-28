@@ -14,11 +14,10 @@ central identity, policy, shared context, updates, observability, and
 operations while introducing network dependence, shared blast radius, and
 company cost.
 
-> [!WARNING]
-> The commands below validate the current transport prototype only. They do not
-> yet run a complete server-hosted plugin behind a separate company MCP
-> gateway. Use them as supporting evidence while implementing the
-> [architecture proposal](proposals/plugin-behind-company-mcp.md).
+The commands below establish the transport stage of the lab. The
+[implementation plan](implementation-plan.md) carries the same evidence model
+through the complete client package, company MCP gateway, and server-hosted
+plugin runtime stages.
 
 Run parity checks before measurements:
 
@@ -64,11 +63,10 @@ Use this observation table:
 | Tail behavior        | Local and remote p95                | Variability worth investigating                      |
 | Operational tradeoff | Evidence tier and manifest controls | Which boundary and deployment were actually measured |
 
-## Target capability-fidelity comparison
+## Capability-fidelity comparison
 
-The redesigned implementation must run the same synthetic user task through
-the complete client plugin and the server-hosted plugin runtime behind the
-company gateway.
+Run the same synthetic user task through the complete client plugin and the
+server-hosted plugin runtime behind the company gateway.
 
 Compare:
 
@@ -108,7 +106,6 @@ component must cite a client-native requirement or failed fidelity test.
 
 ## Do not overclaim
 
-The current report does not prove that the complete plugin can run behind a
-company MCP layer. It proves only local stdio and direct HTTP tool behavior.
-The redesigned report must not claim success until the gateway, internal
-plugin runtime, capability inventory, and fidelity statuses exist.
+The transport report proves local stdio and direct HTTP tool behavior. The
+placement decision additionally requires gateway, internal plugin-runtime,
+capability-inventory, and fidelity-status evidence.

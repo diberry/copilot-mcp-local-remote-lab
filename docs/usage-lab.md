@@ -2,9 +2,9 @@
 
 > This is a learning repository, not a production reference architecture.
 
-The current exercise establishes tool transport parity. The target exercise
-will compare the complete client plugin with the same capability running
-behind a representative company MCP gateway.
+This lab first establishes tool transport parity, then compares the complete
+client plugin with the same capability running behind a representative company
+MCP gateway.
 
 ## 1. Predict the result
 
@@ -56,17 +56,17 @@ This scenario is intentionally small. Its value is not todo functionality; it
 is a controlled probe that crosses every layer—client binding, MCP transport,
 shared registration, validation, domain service, and normalized response.
 
-## 5. Record the current prototype limit
+## 5. Mark the transport checkpoint
 
 Install one binding at a time in a fresh client session. Observe that the
 custom agent, skill, and hooks remain installed in the client in both runs.
-That means the current exercise has not moved the complete plugin behind MCP.
+This checkpoint proves transport behavior, not complete-plugin placement.
 
 The optional `diagnostics` context study remains useful for demonstrating
 provenance and responsibility, but it is not evidence of server-hosted plugin
 fidelity.
 
-## 6. Plan the target fidelity run
+## 6. Run the placement prediction
 
 For each capability, predict whether the server-hosted topology will preserve
 it natively, map it through company MCP, require a thin client companion, or

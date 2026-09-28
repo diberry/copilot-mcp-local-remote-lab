@@ -6,15 +6,16 @@ The lab includes four paced, verified WebM previews. Each video runs for at
 least 20 seconds and presents six steps: context, action, evidence, and a clear
 takeaway.
 
-1. [Context and responsibility boundary](./01-execution-boundary.webm) — shows
-   that the model and plugin stay client-side while evidence, execution, and
-   learner/operator responsibilities change across the MCP boundary.
-1. [Equivalent tool flow](./02-equivalent-tool-flow.webm) — shows the same
-   plugin identity and five-tool discovery surface through both transports.
-1. [Latency comparison](./03-latency-cold-warm.webm) — visualizes the paired,
-   alternating local and remote-test measurements.
-1. [Failure and recovery](./04-failure-and-recovery.webm) — shows a boundary
-   failure followed by a successful recovery.
+1. [Two plugin placements](./01-execution-boundary.webm) — compares a complete
+   client-installed plugin with a server-hosted plugin runtime behind a company
+   MCP gateway.
+1. [Capability fidelity](./02-equivalent-tool-flow.webm) — explains `native`,
+   `mapped`, `companion-required`, and `unsupported` evidence.
+1. [Company value and cost](./03-latency-cold-warm.webm) — balances shared
+   context, central updates, identity, and policy against network, service, and
+   operating costs.
+1. [Client, server, or hybrid](./04-failure-and-recovery.webm) — uses fidelity
+   and responsibility evidence to make the placement decision.
 
 Run `npm run video:prepare`, `npm run video:capture`, and
 `npm run video:verify` in that order. The preparation command creates a local,

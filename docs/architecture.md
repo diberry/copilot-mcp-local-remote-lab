@@ -2,7 +2,7 @@
 
 > This is a learning repository, not a production reference architecture.
 
-## Target topologies
+## Placement topologies
 
 The experiment compares two implementation topologies for one intended
 capability. It does not assume that moving behind company MCP preserves every
@@ -79,14 +79,14 @@ The hybrid topology is not assumed. It is selected only when a fidelity test
 shows that valuable client-native behavior cannot cross MCP or when local and
 offline context is a requirement.
 
-## Current implementation gap
+## Implementation stages
 
-The repository currently builds one client plugin with local and remote MCP
-bindings. Its custom agent, skill, and hooks remain client-side in both cases.
-The HTTP adapter directly hosts the tools. There is no separate company MCP
-gateway or server-hosted plugin runtime.
+The transport foundation builds one client plugin with local and remote MCP
+bindings. Its custom agent, skill, and hooks remain client-side in those
+transport exercises, and the HTTP adapter directly hosts the tools.
 
-Those tests remain useful as a transport baseline, but they cannot answer
-whether the complete plugin retains its behavior behind a company MCP layer.
-The implementation changes are planned in the
-[company MCP architecture proposal](proposals/plugin-behind-company-mcp.md).
+The placement stages add the canonical capability inventory, complete client
+package, company MCP gateway, server-hosted plugin runtime, and
+capability-fidelity report described in the
+[implementation plan](implementation-plan.md). Together, the stages form one
+lab and one evidence chain.

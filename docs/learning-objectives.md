@@ -32,7 +32,7 @@ approval, error, and telemetry behavior, record one status:
 - **native:** preserved without adaptation;
 - **mapped:** represented through an MCP or company-layer contract;
 - **companion-required:** needs a thin client component; or
-- **unsupported:** cannot be preserved in the target topology.
+- **unsupported:** cannot be preserved in the selected topology.
 
 A missing behavior without an explicit status is a failed experiment.
 
@@ -65,9 +65,8 @@ After the lab, verify that you can answer:
 
 ## Limits of the evidence
 
-- The current fixture and loopback implementation proves only a lower-level
-  transport baseline. It does not yet implement the target company gateway and
-  server-hosted plugin runtime.
+- Fixture and loopback results are the transport stage of the evidence chain;
+  they do not by themselves prove company-gateway or complete-plugin fidelity.
 - The videos visualize sanitized evidence; they do not record a native Copilot
   client or Azure portal.
 - A `live-aca` report proves only the queried deployment and controls recorded
@@ -76,5 +75,5 @@ After the lab, verify that you can answer:
   statistical superiority.
 - In-memory, single-replica behavior intentionally excludes persistence and
   horizontal scaling from the baseline.
-- The future company layer remains representative and synthetic; it cannot
-  prove compatibility with a proprietary enterprise MCP implementation.
+- The company layer is representative and synthetic; it cannot prove
+  compatibility with a proprietary enterprise MCP implementation.

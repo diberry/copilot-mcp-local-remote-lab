@@ -1,19 +1,17 @@
-# Put a plugin behind a company MCP layer
+# Lab architecture and implementation plan
 
 ## Problem statement
 
-The current lab compares one client-installed Agent Plugin whose MCP tools run
-over local stdio or remote Streamable HTTP. That proves transport, discovery,
-and domain parity, but it does not answer the intended architecture question:
+This lab answers one architecture question:
 
 > What do I gain and lose if I stop distributing the complete plugin to every
 > client and instead run it behind my company's MCP layer?
 
-The existing byte-identity invariant keeps the custom agent, skill, hooks, and
-orchestration in the client. It therefore assumes away the capability-fidelity,
-governance, and responsibility tradeoffs that the lab needs to expose.
+The lab uses transport, discovery, and domain parity as foundation evidence,
+then measures capability fidelity, governance, and responsibility across the
+two placement topologies.
 
-## Proposed architecture
+## Lab architecture
 
 Build one portable capability definition and execute it through two distinct
 topologies.
@@ -80,24 +78,24 @@ Do not require the generated artifacts to be byte-identical. Require a
 traceable mapping from every canonical capability to its realization and
 fidelity status in each topology.
 
-## What changes
+## Implementation mapping
 
-| Current implementation                                         | Required change                                                                                                                    |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Local and remote packages are byte-identical except `mcp.json` | Replace byte identity as the primary invariant with a capability inventory and fidelity report                                     |
-| Agent, skill, and hooks always remain in the client            | Implement a server-hosted runtime for their portable behavior and identify what still needs a client companion                     |
-| Remote HTTP adapter is the remote product boundary             | Insert an explicit company MCP gateway in front of the plugin runtime                                                              |
-| Parity means identical tool discovery and todo state           | Expand parity to task outcome, instructions, workflow, policy, approvals, context use, errors, and evidence                        |
-| Latency is the main measured difference                        | Make capability fidelity, governance, trust, and responsibility transfer the primary results; retain latency as one secondary cost |
-| Context study is selected by transport                         | Source context through explicit local and company providers so context placement is independent of transport                       |
-| One ACA service hosts the MCP adapter and tools                | Plan separate gateway and internal plugin-runtime components, even if a local test profile runs both in one process                |
+| Lab requirement                       | Implementation                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Preserve one intended capability      | Canonical capability inventory and fidelity report                                          |
+| Run the complete plugin on the client | Client package adapter with agent, skill, hooks, tools, context, and orchestration          |
+| Put the plugin behind company MCP     | Public company gateway in front of a non-public server plugin runtime                       |
+| Compare more than tool results        | Task outcome, instructions, workflow, policy, approvals, context, errors, and evidence      |
+| Treat latency as one cost             | Capability fidelity, governance, trust, and responsibility are primary results              |
+| Keep context placement explicit       | Separate local and company context providers                                                |
+| Demonstrate the trust boundary        | Distinct gateway and runtime components, even when a local profile runs both in one process |
 
 ## What stays the same
 
 - TypeScript workspace and simple synthetic todo domain.
 - Secure-by-default learning posture and non-production disclaimer.
 - No real company data, credentials, prompts, or proprietary MCP contracts.
-- Local stdio and Streamable HTTP protocol tests as lower-level evidence.
+- Local stdio and Streamable HTTP protocol tests as foundation evidence.
 - Azure Container Apps and `azd` for an optional, explicitly authorized live
   deployment.
 - Deterministic fixtures, auditable manifests, sanitized telemetry, Playwright
@@ -105,15 +103,15 @@ fidelity status in each topology.
 
 ## Implementation plan
 
-### Wave 0: freeze the transport prototype
+### Stage 1: establish the transport foundation
 
-**Output:** Label the current stdio/HTTP implementation as a lower-level
-transport baseline, not the answer to the company-MCP decision.
+**Output:** Establish stdio/HTTP tool, discovery, domain, latency, and failure
+evidence that later placement comparisons can reuse.
 
 **Validation:** Docs and tests no longer claim byte-identical packages prove
 plugin-placement parity.
 
-### Wave 1: define the capability inventory
+### Stage 2: define the capability inventory
 
 **Output:**
 
@@ -126,7 +124,7 @@ plugin-placement parity.
 **Validation:** Every current plugin feature has an owner, source path,
 expected outcome, and topology mapping.
 
-### Wave 2: build the complete client-hosted reference
+### Stage 3: build the complete client-hosted reference
 
 **Output:**
 
@@ -138,7 +136,7 @@ expected outcome, and topology mapping.
 **Validation:** A clean client profile can install, run, inspect, and uninstall
 the complete package without the company gateway.
 
-### Wave 3: build the company MCP boundary
+### Stage 4: build the company MCP boundary
 
 **Output:**
 
@@ -152,7 +150,7 @@ the complete package without the company gateway.
 **Validation:** Direct runtime access fails; authorized gateway requests reach
 the runtime; unauthorized and cross-tenant fixtures fail closed.
 
-### Wave 4: map plugin behavior into the server runtime
+### Stage 5: map plugin behavior into the server runtime
 
 **Output:**
 
@@ -165,7 +163,7 @@ the runtime; unauthorized and cross-tenant fixtures fail closed.
 **Validation:** Fidelity tests produce an explicit result for every capability;
 no missing feature silently passes.
 
-### Wave 5: run the decision experiment
+### Stage 6: run the decision experiment
 
 **Output:** Compare client-hosted, server-hosted-behind-MCP, and hybrid
 topologies using the same synthetic task and evidence rubric.
@@ -185,7 +183,7 @@ Measure:
 **Validation:** Produce a decision scorecard that recommends client, server, or
 hybrid from explicit evidence rather than a transport preference.
 
-### Wave 6: deploy the representative company layer
+### Stage 7: deploy the representative company layer
 
 **Output:** Use `azd` and Bicep to deploy an externally reachable gateway and
 an internal plugin runtime to Azure Container Apps.
@@ -194,7 +192,7 @@ an internal plugin runtime to Azure Container Apps.
 images, revisions, identity, policy profile, region, scaling, and cleanup
 result. No deployment occurs without separate authorization.
 
-### Wave 7: update the learning experience
+### Stage 8: complete the learning experience
 
 **Output:** Rewrite the guided lab, architecture diagrams, responsibility
 matrix, videos, and troubleshooting around the placement decision.
@@ -301,7 +299,7 @@ client requirement.
 
 ## Success criteria
 
-The redesigned lab is complete when:
+The lab is complete when:
 
 1. the client-hosted topology runs the complete plugin capability;
 1. the remote topology reaches a server-hosted plugin runtime only through the

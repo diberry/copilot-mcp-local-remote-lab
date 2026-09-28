@@ -9,12 +9,10 @@ The remote design does not turn the plugin into an MCP server. A company MCP
 gateway authenticates, authorizes, applies policy, and routes requests to a
 server-hosted plugin runtime behind it.
 
-> [!WARNING]
-> The current implementation is a transport prototype: it keeps the agent,
-> skill, and hooks in the client while moving only MCP tool execution. It does
-> not yet answer the complete plugin-placement question. The approved redesign
-> is documented in the
-> [company MCP architecture proposal](docs/proposals/plugin-behind-company-mcp.md).
+The lab builds its evidence in stages. It first establishes transport,
+discovery, domain, latency, and failure controls. It then uses one capability
+inventory to compare the complete client plugin with a server-hosted plugin
+runtime behind a representative company MCP gateway.
 
 ## What you will learn
 
@@ -50,7 +48,7 @@ Microsoft 365 Copilot plugin.
 ## Learning path
 
 1. Start with the [learning contract](docs/learning-objectives.md), the
-   [company MCP architecture proposal](docs/proposals/plugin-behind-company-mcp.md),
+   [architecture and implementation plan](docs/implementation-plan.md),
    then read [concepts](docs/concepts.md), [architecture](docs/architecture.md),
    and the [source code tour](packages/README.md).
 2. Complete [local setup](docs/local-setup.md) and the [usage lab](docs/usage-lab.md).
@@ -72,8 +70,9 @@ npm run video:capture
 npm run video:verify
 ```
 
-These commands validate the existing transport prototype, not the proposed
-server-hosted plugin runtime. No Azure subscription or native Copilot client is
-required for the fixture/loopback checks, and none of these commands deploys
-Azure resources. See [troubleshooting](docs/troubleshooting.md),
-[tool reference](docs/reference/tools.md), and [contributing](CONTRIBUTING.md).
+These commands validate the lab's transport foundation. No Azure subscription
+or native Copilot client is required for the fixture/loopback checks, and none
+of these commands deploys Azure resources. See
+[troubleshooting](docs/troubleshooting.md),
+[tool reference](docs/reference/tools.md), and
+[contributing](CONTRIBUTING.md).

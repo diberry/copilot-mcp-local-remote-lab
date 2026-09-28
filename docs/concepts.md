@@ -51,7 +51,7 @@ allowed to differ because their hosts expose different primitives. The
 capability inventory makes those differences auditable instead of hiding them
 behind byte-identical client bundles.
 
-The redesigned experiment has three questions:
+The experiment has three questions:
 
 1. **Fidelity:** Which complete-plugin behaviors remain native, map cleanly,
    require a companion, or are lost?
@@ -60,5 +60,5 @@ The redesigned experiment has three questions:
 1. **Responsibility:** What moves from the user to the company operator, and
    what trust, failure, latency, and cost are introduced?
 
-Tool transport parity remains useful lower-level evidence, but it is not proof
-of complete-plugin fidelity.
+Tool transport parity is foundation evidence, but it is not proof of
+complete-plugin fidelity.
