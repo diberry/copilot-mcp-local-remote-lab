@@ -38,10 +38,8 @@ A missing behavior without an explicit status is a failed experiment.
 
 ## Evidence chain
 
-| Surface              | What to inspect                                                                                     | What it teaches or proves |
-| -------------------- | --------------------------------------------------------------------------------------------------- | ------------------------- |
 | Surface              | Target evidence                                                                                     |
-| ---                  | ---                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
 | Capability source    | One inventory maps every plugin behavior to client and server realizations                          |
 | Client topology      | Complete plugin package runs without the company gateway                                            |
 | Remote topology      | Public company MCP gateway fronts a non-public plugin runtime                                       |
