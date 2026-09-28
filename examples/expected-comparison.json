@@ -1,0 +1,11 @@
+{
+  "equivalent": true,
+  "allowedDifferences": [
+    "requestId",
+    "transport",
+    "durationMs",
+    "revision",
+    "replica",
+    "processStartupDurationMs"
+  ]
+}

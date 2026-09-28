@@ -1,0 +1,17 @@
+{
+  "transport": "streamable-http",
+  "evidenceTier": "remote-test",
+  "remoteEndpoint": "loopback",
+  "discoverySha256": "7601d3e67c2b53a3aff74717884983a56b25bd1066fad1b8800500b92526a108",
+  "pluginVersion": "1.0.0",
+  "toolCount": 5,
+  "durationsMs": [
+    20, 24, 22, 28, 21, 20, 23, 25, 22, 26, 21, 24, 23, 29, 22, 20, 25, 24, 23,
+    27
+  ],
+  "outcome": "success",
+  "recoveryScenario": {
+    "boundaryFailureCategory": "network",
+    "recoveryOutcome": "success"
+  }
+}

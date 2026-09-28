@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "copilot-mcp-local-remote-lab",
+  "capabilities": [
+    {
+      "id": "todo-tools",
+      "source": "dist/plugin/capability.js",
+      "client": "native",
+      "companyMcp": "native",
+      "evidence": "Discovery and scenario tests execute the same artifact hash."
+    },
+    {
+      "id": "domain-validation-and-errors",
+      "source": "dist/plugin/capability.js",
+      "client": "native",
+      "companyMcp": "native",
+      "evidence": "The executable artifact bundles one validation and error implementation."
+    },
+    {
+      "id": "custom-agent-instructions",
+      "source": "com.github.copilot/agents/todo-experimenter.agent.md",
+      "client": "native",
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion copies the canonical agent bytes and performs disclosure review and approval on the client."
+    },
+    {
+      "id": "skill-workflow",
+      "source": "skills/compare-todo-execution/SKILL.md",
+      "client": "native",
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion copies the canonical skill bytes; the connection-only profile demonstrates their absence."
+    },
+    {
+      "id": "tool-lifecycle-hooks",
+      "source": "com.github.copilot/hooks/hooks.json",
+      "client": "native",
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion retains byte-identical local hooks while gateway policy and runtime telemetry remain separate server controls."
+    },
+    {
+      "id": "local-context",
+      "source": "learner-approved-local-fixture",
+      "client": "native",
+      "companyMcp": "companion-required",
+      "evidence": "The companion agent lists synthetic disclosure values and requires approval before any company MCP task call."
+    },
+    {
+      "id": "company-context",
+      "source": "operator-curated-team-fixture",
+      "client": "unsupported",
+      "companyMcp": "native",
+      "evidence": "The company runtime can provide governed shared evidence and provenance."
+    },
+    {
+      "id": "client-native-approval",
+      "source": "copilot-client",
+      "client": "native",
+      "companyMcp": "companion-required",
+      "evidence": "The companion agent requires explicit client-side approval and stops before remote task calls when approval is absent."
+    }
+  ]
+}

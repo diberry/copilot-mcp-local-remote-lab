@@ -1,0 +1,8 @@
+{
+  "name": "Copilot MCP lab",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "postCreateCommand": "npm ci",
+  "customizations": {
+    "vscode": { "extensions": ["ms-azuretools.vscode-bicep"] }
+  }
+}

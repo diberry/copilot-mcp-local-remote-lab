@@ -1,0 +1,21 @@
+name: copilot-mcp-local-remote-lab
+metadata:
+  template: copilot-mcp-local-remote-lab@1.0.0
+infra:
+  provider: bicep
+  path: infra
+services:
+  gateway:
+    project: .
+    host: containerapp
+    language: js
+    docker:
+      path: Dockerfile.gateway
+      context: .
+  runtime:
+    project: .
+    host: containerapp
+    language: js
+    docker:
+      path: Dockerfile.runtime
+      context: .

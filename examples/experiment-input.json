@@ -1,0 +1,13 @@
+{
+  "seed": "todo-v1",
+  "operations": [
+    "reset_todos",
+    "add_todo",
+    "add_todo",
+    "add_todo",
+    "list_todos",
+    "complete_todo",
+    "list_todos"
+  ],
+  "repetitions": 20
+}

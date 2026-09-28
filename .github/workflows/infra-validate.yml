@@ -1,0 +1,12 @@
+name: Infrastructure validation
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: azure/CLI@9f7ce6f37c31b777ec6c6b6d1dfe7db79f497956 # v2
+        with:
+          inlineScript: az bicep build --file infra/main.bicep

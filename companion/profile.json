@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "profileId": "company-mcp-thin-companion",
+  "retains": [
+    "custom-agent-instructions",
+    "skill-workflow",
+    "tool-lifecycle-hooks",
+    "local-context-disclosure",
+    "client-native-approval"
+  ],
+  "excludes": ["plugin-capability-executable", "local-tool-runtime"],
+  "serverArtifactAttestation": "server-artifact.json"
+}
