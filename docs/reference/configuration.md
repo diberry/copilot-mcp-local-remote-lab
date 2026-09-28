@@ -25,3 +25,8 @@ Runtime variables are `PORT` (default `3001`), `HOST`, and
 `ACA_RUNTIME_APP_NAME`, and optional `AZURE_SUBSCRIPTION_ID`. Do not print
 secret values. `REMOTE_MCP_URL` is accepted only by connection-bundle
 generation and must be credential-free HTTPS.
+
+`npm run plugin:build` generates `plugins/local`, `plugins/remote`, and
+`plugins/companion`. Install only one profile in a fresh client session. The
+remote and companion profiles use the same credential-free HTTPS binding and
+server artifact attestation.

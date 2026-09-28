@@ -5,6 +5,7 @@ import { inventory, root, sha256 } from "./lib.mjs";
 
 const local = resolve(root, "plugins/local");
 const remote = resolve(root, "plugins/remote");
+const companion = resolve(root, "plugins/companion");
 const canonicalArtifact = resolve(root, "artifacts/plugin/canonical");
 const runtimeArtifact = resolve(root, "artifacts/plugin/runtime");
 await rm(resolve(root, "artifacts/plugin"), { recursive: true, force: true });
@@ -50,7 +51,7 @@ await writeFile(
   )}\n`,
 );
 await cp(canonicalArtifact, runtimeArtifact, { recursive: true });
-for (const output of [local, remote]) {
+for (const output of [local, remote, companion]) {
   await rm(output, { recursive: true, force: true });
 }
 await cp(canonicalArtifact, local, { recursive: true });
@@ -70,6 +71,27 @@ await cp(
   resolve(canonicalArtifact, "artifact.json"),
   resolve(remote, "server-artifact.json"),
 );
+await mkdir(companion, { recursive: true });
+await cp(
+  resolve(canonicalArtifact, "plugin.json"),
+  resolve(companion, "plugin.json"),
+);
+await cp(resolve(canonicalArtifact, "skills"), resolve(companion, "skills"), {
+  recursive: true,
+});
+await cp(
+  resolve(canonicalArtifact, "com.github.copilot"),
+  resolve(companion, "com.github.copilot"),
+  { recursive: true },
+);
+await cp(
+  resolve(root, "companion/profile.json"),
+  resolve(companion, "companion.json"),
+);
+await cp(
+  resolve(canonicalArtifact, "artifact.json"),
+  resolve(companion, "server-artifact.json"),
+);
 await cp(
   resolve(root, "config/mcp/local.mcp.json"),
   resolve(local, "mcp.json"),
@@ -86,11 +108,16 @@ await writeFile(
   resolve(remote, "mcp.json"),
   template.replace("https://REMOTE_ENDPOINT.example/mcp", endpoint),
 );
+await writeFile(
+  resolve(companion, "mcp.json"),
+  template.replace("https://REMOTE_ENDPOINT.example/mcp", endpoint),
+);
 await mkdir(resolve(root, "artifacts/plugin-inventory"), { recursive: true });
 const inventories = {};
 for (const [name, directory] of [
   ["local", local],
   ["remote", remote],
+  ["companion", companion],
 ]) {
   inventories[name] = await inventory(directory);
   await writeFile(
@@ -109,11 +136,15 @@ await writeFile(
       canonicalPayloadSha256: hashInventory(payloadInventory),
       localBundleSha256: hashInventory(inventories.local),
       remoteBundleSha256: hashInventory(inventories.remote),
+      companionBundleSha256: hashInventory(inventories.companion),
       serverArtifactSha256: sha256(JSON.stringify(artifactPayloadInventory)),
       localBindingSha256: inventories.local.find(
         (item) => item.path === "mcp.json",
       ).sha256,
       remoteBindingSha256: inventories.remote.find(
+        (item) => item.path === "mcp.json",
+      ).sha256,
+      companionBindingSha256: inventories.companion.find(
         (item) => item.path === "mcp.json",
       ).sha256,
     },

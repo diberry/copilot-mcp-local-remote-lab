@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { root } from "./lib.mjs";
 
-for (const profile of ["local", "remote"]) {
+for (const profile of ["local", "remote", "companion"]) {
   const plugin = JSON.parse(
     await readFile(resolve(root, `plugins/${profile}/plugin.json`), "utf8"),
   );
@@ -19,8 +19,11 @@ for (const profile of ["local", "remote"]) {
   for (const forbidden of ["agents", "mcpServers"])
     if (plugin[forbidden] !== undefined)
       throw new Error(`${profile}: legacy field ${forbidden}`);
-  if (profile === "local" && typeof plugin.hooks !== "string")
-    throw new Error("local: hooks must be a plugin-relative path");
+  if (
+    (profile === "local" || profile === "companion") &&
+    (typeof plugin.hooks !== "string" || !Array.isArray(plugin.skills))
+  )
+    throw new Error(`${profile}: client-native behavior is incomplete`);
   if (
     profile === "remote" &&
     (plugin.hooks !== undefined || plugin.skills !== undefined)
@@ -37,6 +40,18 @@ for (const profile of ["local", "remote"]) {
     artifact.entry !== "dist/plugin/capability.js"
   )
     throw new Error(`${profile}: executable artifact identity mismatch`);
+  if (profile === "companion") {
+    const companion = JSON.parse(
+      await readFile(resolve(root, "plugins/companion/companion.json"), "utf8"),
+    );
+    if (
+      companion.profileId !== "company-mcp-thin-companion" ||
+      !companion.retains.includes("custom-agent-instructions") ||
+      !companion.retains.includes("skill-workflow") ||
+      !companion.excludes.includes("plugin-capability-executable")
+    )
+      throw new Error("companion: profile contract is incomplete");
+  }
 }
 const fidelity = JSON.parse(
   await readFile(
@@ -79,5 +94,5 @@ for (const capability of fidelity.capabilities) {
 if (expectedCapabilities.size !== 0)
   throw new Error("Capability fidelity inventory silently omitted behavior.");
 console.log(
-  "Local plugin and server reuse one artifact; remote has connection metadata only.",
+  "Generated complete-client, connection-only, and thin-companion profiles.",
 );

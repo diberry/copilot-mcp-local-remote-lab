@@ -12,8 +12,10 @@ server-hosted plugin runtime behind it.
 The build creates one executable plugin artifact. The local client loads that
 artifact over stdio. The private company runtime loads the exact same
 `capability.js` bytes and exposes them only through the public company gateway.
-The remote client receives a connection-only package with the expected server
-artifact hash; it does not receive another copy of the implementation.
+The lab generates two remote client profiles: a connection-only package and a
+thin companion. Both attest the expected server artifact and contain no
+capability executable. The companion additionally reuses the canonical agent,
+skill, and hook bytes so disclosure review and approval remain client-native.
 
 ## What you will learn
 
@@ -33,18 +35,19 @@ By completing the lab, you will be able to:
    costs rather than treating transport parity as the final result.
 
 The central question is capability fidelity and responsibility transfer, not
-which transport is faster. “Same plugin” is a hypothesis to test: the company
-MCP layer might preserve tools while losing or changing client-native agent,
-skill, hook, local-context, or approval behavior.
+which transport is faster. The connection-only profile makes client-native
+loss visible; the companion profile shows exactly what must remain local to
+preserve agent instructions, skill workflow, hooks, disclosure review, and
+approval.
 
 ## What runs where?
 
 The client topology installs and runs the complete plugin on the learner
 device. The remote topology keeps only the minimum connection surface in the
 client; the company MCP gateway fronts a server-hosted plugin runtime.
-A thin client companion is allowed only when fidelity evidence proves that a
-client-native behavior cannot cross MCP. This repository does not implement a
-Microsoft 365 Copilot plugin.
+The thin companion is justified by the machine-readable fidelity evidence and
+contains no local tool runtime. This repository does not implement a Microsoft
+365 Copilot plugin.
 
 ## Learning path
 

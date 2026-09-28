@@ -19,8 +19,9 @@ private server runtime.
 Next, inspect `client-plugin-adapter/src/stdio.ts` and
 `server-plugin-runtime/src/artifact-loader.ts`. Both dynamically load the built
 artifact. Neither placement compiles a separate capability implementation.
-The remote client package contains connection metadata and
-`server-artifact.json`, but no executable plugin code.
+The connection-only remote package contains connection metadata and
+`server-artifact.json`. The thin companion adds byte-identical canonical
+agent, skill, and hook files. Neither contains executable plugin code.
 
 ## Variable: MCP boundary
 
@@ -51,7 +52,8 @@ The lab uses these package boundaries across its implementation stages:
 - `client-plugin-adapter` for the complete client-installed package;
 - `company-mcp-gateway` for identity, policy, routing, and telemetry;
 - `server-plugin-runtime` behind the gateway; and
-- a thin client companion only when fidelity tests prove it is required.
+- `plugins/companion`, generated only from client-native files justified by
+  fidelity tests.
 
 The earlier `mcp-server` and `todo-core` packages remain as transport
 foundation evidence. The placement path does not deploy that HTTP server.

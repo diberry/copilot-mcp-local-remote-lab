@@ -1,12 +1,15 @@
 export interface PluginComparison {
-  fileCount: number;
-  differences: string[];
+  localFileCount: number;
+  remoteFileCount: number;
+  companionFileCount: number;
+  artifactSha256: string;
 }
 
 export function comparePluginTrees(
   localDirectory: string,
   remoteDirectory: string,
-  options?: {
+  options: {
+    companionDirectory: string;
     verifyInventories?: boolean;
     inventoryDirectory?: string;
   },

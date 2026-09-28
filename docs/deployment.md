@@ -15,7 +15,7 @@ identities.
 | ------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Company MCP gateway       | Public MCP endpoint, identity, authorization, policy, routing, rate limits, and content-free telemetry    |
 | Server plugin runtime     | Loads the complete built plugin artifact, executes its portable capability, and reports its artifact hash |
-| Client connection surface | Endpoint and authentication configuration only, plus a thin companion if fidelity tests require one       |
+| Client connection surface | Compare endpoint-only and thin-companion profiles; neither contains the capability executable             |
 
 The gateway must be the only public path to the runtime. Direct runtime access
 must fail. Azure evidence must bind both components, their identities, images,
@@ -101,8 +101,9 @@ sequenceDiagram
 Verify `GET /healthz` and `GET /readyz`, inspect console/system logs by correlation ID only, and never log request content. Use the warm profile (`minReplicas=1`) for runnable baseline and authentication cells. Cold-profile measurements remain a manual follow-on until a distinct runner execution path is implemented. Then follow [cleanup](cleanup-and-cost.md).
 
 The company-layer deployment moves the portable capability runtime behind the
-company MCP gateway while recording client-native behavior that remains in a
-thin companion. A production version would require the operator to own:
+company MCP gateway. The generated thin companion retains canonical agent,
+skill, hooks, disclosure review, and approval on the client without retaining
+the tool runtime. A production version would require the operator to own:
 
 - source authorization and tenant isolation;
 - evidence freshness and provenance;

@@ -6,6 +6,7 @@ RUN npm ci
 COPY tsconfig.json plugin.json ./
 COPY scripts ./scripts
 COPY capability ./capability
+COPY companion ./companion
 COPY skills ./skills
 COPY com.github.copilot ./com.github.copilot
 COPY config ./config

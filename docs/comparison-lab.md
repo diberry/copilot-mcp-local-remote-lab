@@ -65,25 +65,26 @@ Use this observation table:
 
 ## Capability-fidelity comparison
 
-Run the same synthetic user task through the complete client plugin and the
-server-hosted plugin runtime behind the company gateway.
+Run the same synthetic user task through the complete client plugin, the
+connection-only company profile, and the thin companion profile. Both remote
+profiles reach the same server-hosted plugin artifact.
 
 Compare:
 
-| Observation            | Complete client plugin         | Plugin behind company MCP                     |
-| ---------------------- | ------------------------------ | --------------------------------------------- |
-| Agent behavior         | Native client implementation   | Fidelity status and server mapping            |
-| Skill workflow         | Native client implementation   | Fidelity status and server mapping            |
-| Hook policy            | Native lifecycle hooks         | Gateway/runtime policy, companion, or loss    |
-| Tools and task outcome | Local capability runtime       | Gateway to server plugin runtime              |
-| Context                | Learner-approved local sources | Operator-governed shared sources              |
-| Approval experience    | Client-native interaction      | Gateway/runtime equivalent or companion       |
-| Updates                | Per-client distribution        | Central runtime deployment                    |
-| Identity and policy    | Local/client controls          | Company gateway controls                      |
-| Availability           | Device and local process       | Network, gateway, and shared runtime          |
-| Failure radius         | Individual user                | Shared service population                     |
-| Evidence               | Local logs and artifacts       | Central provenance and content-free telemetry |
-| Cost                   | Learner device                 | Company infrastructure and operations         |
+| Observation            | Complete client       | Connection-only company | Thin companion company                         |
+| ---------------------- | --------------------- | ----------------------- | ---------------------------------------------- |
+| Agent behavior         | Canonical bytes       | Absent                  | Canonical bytes                                |
+| Skill workflow         | Canonical bytes       | Absent                  | Canonical bytes                                |
+| Hook policy            | Native local hooks    | Gateway/runtime only    | Native hooks plus gateway                      |
+| Tools and task outcome | Local artifact        | Company artifact        | Company artifact                               |
+| Context                | Learner-approved      | Company-governed        | Explicit local disclosure plus company context |
+| Approval experience    | Client-native         | Absent                  | Client-native before remote calls              |
+| Updates                | Complete package      | Connection plus runtime | Companion subset plus runtime                  |
+| Identity and policy    | Local/client controls | Company gateway         | Client approval plus gateway                   |
+| Availability           | Device/process        | Network/shared runtime  | Client companion, network, shared runtime      |
+| Failure radius         | Individual user       | Shared population       | Client behavior plus shared population         |
+| Evidence               | Local artifacts       | Central provenance      | Local lifecycle plus central provenance        |
+| Cost                   | Learner device        | Company operations      | Small client surface plus company operations   |
 
 For every row, record `native`, `mapped`, `companion-required`, or
 `unsupported`. A final matching todo state is insufficient when instructions,
@@ -101,8 +102,9 @@ Recommend:
 - **hybrid** when specific failed fidelity tests prove that a minimal client
   companion is still required.
 
-Do not choose hybrid merely to avoid a decision. Every retained client
-component must cite a client-native requirement or failed fidelity test.
+Do not choose hybrid merely to avoid a decision. The generated companion cites
+the exact fidelity records that require its agent, skill, hook, disclosure,
+and approval surfaces.
 
 ## Do not overclaim
 

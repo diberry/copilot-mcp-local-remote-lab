@@ -33,20 +33,46 @@ const remoteAttestation = JSON.parse(
 );
 if (remoteAttestation.payloadSha256 !== hashes[0])
   throw new Error("Remote connection does not attest the server artifact.");
-try {
+const companionAttestation = JSON.parse(
   await readFile(
-    resolve(root, "plugins/remote/dist/plugin/capability.js"),
+    resolve(root, "plugins/companion/server-artifact.json"),
     "utf8",
-  );
-  throw new Error("Remote connection incorrectly contains plugin execution.");
-} catch (error) {
-  if (
-    !(error instanceof Error) ||
-    !("code" in error) ||
-    error.code !== "ENOENT"
-  )
-    throw error;
+  ),
+);
+if (companionAttestation.payloadSha256 !== hashes[0])
+  throw new Error("Thin companion does not attest the server artifact.");
+for (const profile of ["remote", "companion"]) {
+  try {
+    await readFile(
+      resolve(root, `plugins/${profile}/dist/plugin/capability.js`),
+      "utf8",
+    );
+    throw new Error(`${profile} incorrectly contains plugin execution.`);
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !("code" in error) ||
+      error.code !== "ENOENT"
+    )
+      throw error;
+  }
 }
+const [localInventory, companionInventory] = await Promise.all([
+  inventory(resolve(root, "plugins/local")),
+  inventory(resolve(root, "plugins/companion")),
+]);
+const clientNative = (items) =>
+  items.filter(
+    ({ path }) =>
+      path.startsWith("skills/") || path.startsWith("com.github.copilot/"),
+  );
+if (
+  JSON.stringify(clientNative(localInventory)) !==
+  JSON.stringify(clientNative(companionInventory))
+)
+  throw new Error(
+    "Thin companion does not reuse canonical agent, skill, and hook bytes.",
+  );
 
 for (const packageName of ["company-mcp-gateway", "server-plugin-runtime"]) {
   const files = await filesUnder(resolve(root, `packages/${packageName}/src`));
@@ -63,5 +89,5 @@ for (const packageName of ["company-mcp-gateway", "server-plugin-runtime"]) {
 }
 
 console.log(
-  `One executable plugin artifact is reused by the client and company runtime: ${hashes[0]}`,
+  `Artifact ${hashes[0]} is reused by both runtimes; companion client behavior is byte-identical.`,
 );

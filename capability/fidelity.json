@@ -20,29 +20,29 @@
       "id": "custom-agent-instructions",
       "source": "com.github.copilot/agents/todo-experimenter.agent.md",
       "client": "native",
-      "companyMcp": "unsupported",
-      "evidence": "MCP exposes tools; it does not activate a client custom-agent surface."
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion copies the canonical agent bytes and performs disclosure review and approval on the client."
     },
     {
       "id": "skill-workflow",
       "source": "skills/compare-todo-execution/SKILL.md",
       "client": "native",
-      "companyMcp": "unsupported",
-      "evidence": "The server retains the file in the artifact but does not claim that MCP executes client skill Markdown."
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion copies the canonical skill bytes; the connection-only profile demonstrates their absence."
     },
     {
       "id": "tool-lifecycle-hooks",
       "source": "com.github.copilot/hooks/hooks.json",
       "client": "native",
-      "companyMcp": "mapped",
-      "evidence": "Gateway policy and content-free runtime telemetry map the policy intent, not the client hook process."
+      "companyMcp": "companion-required",
+      "evidence": "The thin companion retains byte-identical local hooks while gateway policy and runtime telemetry remain separate server controls."
     },
     {
       "id": "local-context",
       "source": "learner-approved-local-fixture",
       "client": "native",
       "companyMcp": "companion-required",
-      "evidence": "Local context remains on the device unless the user explicitly discloses it."
+      "evidence": "The companion agent lists synthetic disclosure values and requires approval before any company MCP task call."
     },
     {
       "id": "company-context",
@@ -56,7 +56,7 @@
       "source": "copilot-client",
       "client": "native",
       "companyMcp": "companion-required",
-      "evidence": "MCP cannot replace every client-native interaction or approval surface."
+      "evidence": "The companion agent requires explicit client-side approval and stops before remote task calls when approval is absent."
     }
   ]
 }

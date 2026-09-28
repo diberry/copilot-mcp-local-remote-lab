@@ -42,8 +42,8 @@ A missing behavior without an explicit status is a failed experiment.
 | -------------------- | --------------------------------------------------------------------------------------------------- |
 | Capability source    | One inventory maps every plugin behavior to client and server realizations                          |
 | Client topology      | Complete plugin package runs without the company gateway                                            |
-| Remote topology      | Public company MCP gateway fronts a non-public plugin runtime                                       |
-| Fidelity tests       | Task outcome plus agent, skill, hook, context, approval, error, and provenance behavior             |
+| Remote topology      | Connection-only and thin-companion clients use a public gateway in front of a non-public runtime    |
+| Fidelity tests       | Three-profile task, package, agent, skill, hook, approval, error, and provenance evidence           |
 | Responsibility tests | User and operator duties are explicit for updates, identity, data, reliability, telemetry, and cost |
 | Videos               | Capability retained, capability lost, company governance gained, and hybrid decision                |
 | Deployment           | Gateway and internal runtime have distinct identities, ingress, revisions, and evidence             |

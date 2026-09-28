@@ -160,9 +160,10 @@ the runtime; unauthorized and cross-tenant fixtures fail closed.
 
 ### Stage 5: map plugin behavior into the server runtime
 
-**Status:** Implemented with explicit fidelity results. Client-native agent and
-skill surfaces remain `unsupported` behind MCP rather than silently passing;
-local context and approvals are `companion-required`.
+**Status:** Implemented with three generated profiles. Agent, skill, hooks,
+local disclosure review, and approval are `companion-required` and retained
+byte-for-byte in the thin companion. The connection-only profile demonstrates
+their absence.
 
 **Output:**
 
@@ -170,7 +171,8 @@ local context and approvals are `companion-required`.
 - Map hook intent to gateway/runtime policy where semantically valid.
 - Record any behavior that requires a thin client companion or cannot be
   represented.
-- Add a minimal companion profile only for capabilities proven to require it.
+- Generate a minimal companion profile only for capabilities proven to require
+  it, without copying the capability executable.
 
 **Validation:** Fidelity tests produce an explicit result for every capability;
 no missing feature silently passes.
@@ -306,7 +308,8 @@ client requirement.
 - Complete client-hosted implementation.
 - Representative company MCP gateway.
 - Server-hosted plugin runtime behind the gateway.
-- Optional thin companion discovered through evidence.
+- Thin companion discovered through evidence, with byte-level comparison
+  against the complete client plugin.
 - Client/server/hybrid decision scorecard.
 - Local automated evidence and optional authorized ACA deployment.
 

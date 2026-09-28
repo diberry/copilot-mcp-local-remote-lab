@@ -52,6 +52,22 @@ operator owns deployment, updates, availability, recovery, scaling, and cost.
 The user still owns authentication, disclosure choices, and the decision to
 trust or reject returned evidence.
 
+### Remote client profiles
+
+```mermaid
+flowchart LR
+  A[Server artifact attestation] --> O[Connection-only profile]
+  A --> H[Thin companion]
+  C[Canonical agent + skill + hooks] --> H
+  O --> G[Company MCP gateway]
+  H --> G
+```
+
+`plugins/remote` contains only connection metadata and the server artifact
+attestation. `plugins/companion` adds byte-identical agent, skill, and hook
+files from the complete plugin, plus a profile contract. Neither remote
+profile contains `capability.js` or a local tool runtime.
+
 ## Capability mapping
 
 ```mermaid
@@ -68,9 +84,10 @@ flowchart TB
 
 `scripts/build-plugin.mjs` builds the executable artifact once. It copies that
 artifact without recompilation to `plugins/local` and
-`artifacts/plugin/runtime`. Both loaders verify `artifact.json`; the remote
-connection contains only `mcp.json`, `plugin.json`, and
-`server-artifact.json`. The gateway and runtime are forbidden from importing
+`artifacts/plugin/runtime`. Both loaders verify `artifact.json`. The
+connection-only profile contains `mcp.json`, `plugin.json`, and
+`server-artifact.json`; the thin companion adds only canonical client-native
+behavior. The gateway and runtime are forbidden from importing
 `plugin-capability` or `todo-core` source.
 
 The artifact also carries `capability/fidelity.json`, which records tool
@@ -95,5 +112,6 @@ offline context is a requirement.
 - `packages/company-mcp-gateway` never imports plugin implementation code. It
   authenticates, applies boundary policy, proxies MCP, and emits content-free
   operational telemetry.
-- `scripts/verify-artifact-reuse.mjs` proves byte identity and rejects source
-  coupling.
+- `scripts/verify-artifact-reuse.mjs` proves runtime byte identity, rejects
+  source coupling, verifies companion agent/skill/hook parity, and rejects
+  executable capability code in either remote client profile.

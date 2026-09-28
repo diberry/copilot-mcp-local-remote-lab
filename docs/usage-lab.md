@@ -15,8 +15,8 @@ Before running either binding, write down what should remain identical:
 - Todo IDs and insertion order.
 - `todo-2` completed in the final list.
 
-The expected difference is the `diagnostics.transport` value: `stdio` locally
-and `streamable-http` remotely.
+The expected difference is `diagnostics.data.placement`: `client` locally and
+`company-mcp` through either remote profile.
 
 ## 2. Run the fixed scenario
 
@@ -32,10 +32,11 @@ Invoke the operations in this order:
 1. `list_todos`
 
 The custom agent constrains this order, the skill explains experiment
-controls, and the client hook records content-free timing metadata. Those
-client extensions remain client-side. The MCP server returns wrappers with
-`requestId`, `operation`, `outcome`, `serverVersion`, and `data` or normalized
-`error`.
+controls, and the client hook records content-free lifecycle metadata. The
+complete client and thin companion retain those client-native files; the
+connection-only profile intentionally omits them. The plugin artifact returns
+wrappers with `requestId`, `operation`, `outcome`, `pluginVersion`, and `data`
+or normalized `error`.
 
 ## 3. Check the evidence
 
@@ -56,13 +57,22 @@ This scenario is intentionally small. Its value is not todo functionality; it
 is a controlled probe that crosses every layer—client binding, MCP transport,
 shared registration, validation, domain service, and normalized response.
 
-## 5. Mark the transport checkpoint
+## 5. Compare the three client profiles
 
-Install one binding at a time in a fresh client session. Observe that the
-custom agent, skill, and hooks remain installed in the client in both runs.
-This checkpoint proves transport behavior, not complete-plugin placement.
+Install one profile at a time in a fresh client session:
 
-The optional `diagnostics` context study remains useful for demonstrating
+| Profile             | Tool runtime           | Agent, skill, hooks | Disclosure approval |
+| ------------------- | ---------------------- | ------------------- | ------------------- |
+| `plugins/local`     | Learner device         | Canonical bytes     | Client-native       |
+| `plugins/remote`    | Company plugin runtime | Absent              | Absent              |
+| `plugins/companion` | Company plugin runtime | Canonical bytes     | Client-native       |
+
+Confirm that `plugins/companion` requests approval before sending the listed
+synthetic values. Decline once and verify that no task tool call occurs; then
+approve and run the fixed scenario. This isolates the value and responsibility
+of the thin companion from the server artifact and transport.
+
+The `diagnostics` context study remains useful for demonstrating
 provenance and responsibility, but it is not evidence of server-hosted plugin
 fidelity.
 

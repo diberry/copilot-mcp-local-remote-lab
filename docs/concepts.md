@@ -11,10 +11,11 @@ package can instead run behind a company's MCP layer. “Behind” matters: the
 plugin runtime is not the public MCP server. A company gateway fronts it and
 owns identity, authorization, policy, routing, and operational controls.
 
-The company boundary might not preserve every client-native feature. Tool
-calls can map cleanly to MCP while custom-agent behavior, skills, hooks, local
-context, and interactive approvals might require adaptation or a thin client
-companion. The lab must measure that fidelity rather than assume it.
+The company boundary does not execute client-native surfaces. Tool calls map
+cleanly to MCP, while the implemented thin companion retains the canonical
+custom agent, skill, hooks, disclosure review, and approval on the client. The
+connection-only profile makes the behavior lost without that companion
+observable.
 
 ## Compare placement choices
 
@@ -26,9 +27,9 @@ Choose a server-hosted plugin behind company MCP when centralized identity,
 policy, updates, shared systems, governed context, observability, and service
 operations outweigh fidelity gaps and network dependence.
 
-Choose hybrid only when evidence shows that a thin client companion is needed
-for client-native UX, local context, approvals, hooks, or offline behavior
-while the shared capability belongs behind company MCP.
+Choose hybrid when the three-profile evidence shows that the implemented thin
+companion is needed for client-native UX, local context disclosure, approvals,
+or hooks while the shared capability belongs behind company MCP.
 
 ## Follow responsibility across the boundary
 
@@ -46,12 +47,10 @@ while the shared capability belongs behind company MCP.
 ## Preserve capability intent, not package bytes
 
 The synthetic user task, intended capability, domain rules, and expected
-business outcome remain fixed. The client package and server runtime are
-allowed to differ because their hosts expose different primitives. The
-capability inventory makes those differences auditable instead of hiding them
-behind byte-identical client bundles. This lab instead proves that the local
-client and private runtime load one executable artifact hash while the remote
-client carries connection metadata only.
+business outcome remain fixed. The complete client and private runtime load
+one executable artifact hash. The connection-only client carries metadata and
+attestation only; the companion adds a byte-identical subset of client-native
+files without copying the executable capability.
 
 The experiment has three questions:
 
